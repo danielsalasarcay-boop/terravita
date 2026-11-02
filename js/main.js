@@ -265,10 +265,6 @@
   function headerTick() {
     const y = scrollY;
     header.classList.toggle('is-scrolled', y > 40);
-    if (!document.documentElement.classList.contains('menu-open')) {
-      header.classList.toggle('is-hidden', y > lastY + 2 && y > 240);
-      if (y < lastY - 2) header.classList.remove('is-hidden');
-    }
     lastY = y;
     const probe = 34;
     let light = HOME && zoom > 0.55 && hero.getBoundingClientRect().bottom > probe;
@@ -277,6 +273,50 @@
       if (r.top < probe && r.bottom > probe) light = true;
     }
     header.classList.toggle('is-light', light);
+  }
+
+  // Píldora del menú (como Casa Verde Jesko): sigue al cursor; sin cursor, marca la sección visible
+  {
+    const groups = $$('.header__nav');
+    let active = $('.header__nav a[aria-current]'), hover = null;
+    groups.forEach(g => { const p = document.createElement('span'); p.className = 'nav-pill'; p.setAttribute('aria-hidden', 'true'); g.prepend(p); });
+    const place = () => {
+      const a = hover || active;
+      groups.forEach(g => {
+        const p = $('.nav-pill', g);
+        if (a && g.contains(a)) {
+          const b = g.getBoundingClientRect(), r = a.getBoundingClientRect();
+          p.style.transform = `translateX(${r.left - b.left}px)`; p.style.width = r.width + 'px'; p.style.opacity = 1;
+        } else p.style.opacity = 0;
+        $$('a', g).forEach(x => x.classList.toggle('bajo', x === a));
+      });
+    };
+    groups.forEach(g => {
+      $$('a', g).forEach(a => {
+        a.addEventListener('mouseenter', () => { hover = a; place(); });
+        a.addEventListener('mousemove', () => { if (hover !== a) { hover = a; place(); } });
+        a.addEventListener('focus', () => { hover = a; place(); });
+        a.addEventListener('blur', () => { hover = null; place(); });
+      });
+      g.addEventListener('mouseleave', () => { hover = null; place(); });
+    });
+    // Sección activa: la que cruza la franja central de la pantalla
+    const links = $$('.header__nav a[href^="#"]');
+    const secs = links.map(a => $(a.getAttribute('href')));
+    if (secs.some(Boolean)) {
+      const sio = new IntersectionObserver(es => {
+        es.forEach(e => {
+          const i = secs.indexOf(e.target);
+          if (e.isIntersecting) active = links[i]; else if (active === links[i]) active = null;
+        });
+        links.forEach(a => a === active ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current'));
+        place();
+      }, { rootMargin: '-45% 0px -50% 0px' });
+      secs.forEach(s => s && sio.observe(s));
+    }
+    addEventListener('scroll', () => { if (hover && !hover.matches(':hover')) { hover = null; place(); } }, { passive: true });
+    addEventListener('resize', place);
+    (document.fonts ? document.fonts.ready : Promise.resolve()).then(place);
   }
 
   // Menú del teléfono

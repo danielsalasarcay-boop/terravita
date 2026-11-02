@@ -68,21 +68,18 @@
   </div>
 
   <!-- HEADER -->
+  <!-- HEADER como el de Casa Verde Jesko: enlaces a los lados, logo al centro, píldora que sigue al cursor -->
   <header class="header" id="header">
+    <nav class="header__nav header__nav--l" aria-label="Principal">
+      <a href="#catalogo">Catálogo</a><a href="#eventos">Eventos</a><a href="#clases">Clases</a><a href="nosotros.html">Nosotros</a>
+    </nav>
     <a class="header__brand" href="#inicio" aria-label="Terravita, inicio">
       <svg class="header__mark" viewBox="0 0 1464 1736"><use href="#mark"/></svg>
       <svg class="header__word" viewBox="0 0 1585 1150"><use href="#word"/></svg>
     </a>
-    <nav class="header__nav" aria-label="Principal">
-      <a href="#catalogo">Catálogo</a>
-      <a href="#eventos">Eventos</a>
-      <a href="#clases">Clases</a>
-      <a href="nosotros.html">Nosotros</a>
-      <a href="#contacto">Contacto</a>
-    </nav>
-    <a class="btn btn--small header__cta" href="https://wa.me/584128270907" data-wa="¡Hola Terravita! Quiero reservar una clase." target="_blank" rel="noopener">
-      <span>Reservar</span>
-    </a>
+    <div class="header__nav header__nav--r">
+      <a href="#contacto">Contacto</a><a class="header__cta" href="https://wa.me/584128270907" data-wa="¡Hola Terravita! Quiero reservar una clase." target="_blank" rel="noopener">Reservar</a>
+    </div>
     <button class="header__burger" id="burger" aria-label="Abrir menú" aria-expanded="false" aria-controls="menu"><span></span><span></span></button>
   </header>
 
