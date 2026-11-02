@@ -575,12 +575,15 @@
     let W = 0, dpr = 1, target = reduce ? 1 : 0, ps = target, spin = 0, boost = 0, lx = .3, lxT = .3, time = 0, lastCap = -1;
     const size = () => { dpr = Math.min(2, devicePixelRatio || 1); const r = cv.getBoundingClientRect(); W = Math.round(r.width * dpr); cv.width = cv.height = W; };
     size(); addEventListener('resize', size);
-    const desk = matchMedia('(min-width: 900px)');
-    const mk = () => desk.matches
-      ? ScrollTrigger.create({ trigger: '#contacto', start: 'top top', end: 'bottom bottom', onUpdate: s => { target = s.progress; }, onRefresh: s => { target = s.progress; } })
-      : ScrollTrigger.create({ trigger: pieceEl, start: 'top 90%', end: 'bottom 15%', onUpdate: s => { target = s.progress; }, onRefresh: s => { target = s.progress; } });
-    let st = reduce ? null : mk();
-    desk.addEventListener?.('change', () => { st?.kill(); st = reduce ? null : mk(); ScrollTrigger.refresh(); });
+    // En el teléfono, mientras Contacto está fijo en pantalla, los flotantes se apartan
+    ScrollTrigger.create({ trigger: '#contacto', start: 'top 60%', end: 'bottom 40%',
+      onToggle: s => $('.float')?.classList.toggle('is-away', s.isActive && matchMedia('(max-width: 899px)').matches) });
+    // En el teléfono la pieza termina al 80% del recorrido: queda quieta con el sello antes de que llegue el footer
+    const phone = matchMedia('(max-width: 899px)');
+    const fit = v => phone.matches ? clamp(v / .8) : v;
+    // En computadora y en el teléfono la sección se queda fija y la pieza avanza con todo el recorrido
+    if (!reduce) ScrollTrigger.create({ trigger: '#contacto', start: 'top top', end: 'bottom bottom',
+      onUpdate: s => { target = fit(s.progress); }, onRefresh: s => { target = fit(s.progress); size(); } });
     if (fine) pieceEl.addEventListener('pointermove', e => { const r = cv.getBoundingClientRect(); lxT = clamp(((e.clientX - r.left) / r.width) * 2 - 1, -1, 1); });
     $$('.contact__row').forEach(row => { row.addEventListener('mouseenter', () => { boost = 1; }); row.addEventListener('mouseleave', () => { boost = 0; }); });
 
@@ -588,7 +591,7 @@
       const r0 = cv.getBoundingClientRect();
       if (r0.bottom < -100 || r0.top > innerHeight + 100 || !W) return;
       time += dt;
-      ps = lerp(ps, target, .08);
+      ps = lerp(ps, target, phone.matches ? .14 : .08);
       lx = lerp(lx, lxT, .06);
       // etapa: 0..5 (la 5 es horno/esmalte/sello sobre el jarrón)
       const s = clamp(ps * 1.06, 0, 1) * 5;
