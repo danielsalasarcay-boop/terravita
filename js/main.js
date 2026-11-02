@@ -9,8 +9,8 @@
   // Datos de contacto (un solo lugar para cambiarlos)
   // ------------------------------------------------------------------
   const SITE = {
-    whatsapp: '584128270907',            // WhatsApp principal
-    phone: '+584241192157',              // Llamadas
+    whatsapp: '584241192157',            // WhatsApp principal
+    phone: '+584128270907',              // Llamadas
     instagram: 'https://www.instagram.com/taller_terravita/',
     tiktok: 'https://www.tiktok.com/@terra_vita', // CONFIRMAR usuario de TikTok
   };
