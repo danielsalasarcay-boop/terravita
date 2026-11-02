@@ -462,9 +462,12 @@
     // Catálogo: la hoja crema sube sobre la página
     if ($('.shop')) gsap.from('.shop', { borderRadius: '120px 120px 0 0', ease: 'none', scrollTrigger: { trigger: '.shop', start: 'top bottom', end: 'top 30%', scrub: true } });
 
-    // Footer: la vasija gira hasta su sitio y la marca sube
-    gsap.fromTo('.footer__mark', { rotation: -24, yPercent: 30 }, { rotation: 0, yPercent: 0, ease: 'none', scrollTrigger: { trigger: '.footer', start: 'top bottom', end: 'bottom bottom', scrub: true } });
-    gsap.fromTo('.footer__lock, .footer__slogan', { yPercent: 30, opacity: 0 }, { yPercent: 0, opacity: 1, ease: 'none', stagger: 0.1, scrollTrigger: { trigger: '.footer', start: 'top bottom', end: 'bottom bottom', scrub: true } });
+    // Footer (efecto como Caraqueña): el logo sube y aparece; la vasija gira hasta su sitio como saliendo del torno;
+    // el moteado del fondo se desplaza despacio
+    const ft = { trigger: '.footer', start: 'top bottom', end: 'bottom bottom', scrub: true };
+    gsap.fromTo('.footer__lock', { yPercent: 40, opacity: 0 }, { yPercent: 0, opacity: 1, ease: 'none', scrollTrigger: ft });
+    gsap.fromTo('.footer__mark', { rotation: -200, scale: .6, opacity: 0 }, { rotation: 0, scale: 1, opacity: 1, ease: 'none', scrollTrigger: ft });
+    gsap.fromTo('.footer', { backgroundPosition: '0px 120px' }, { backgroundPosition: '0px 0px', ease: 'none', scrollTrigger: ft });
   }
 
   // ------------------------------------------------------------------
@@ -631,7 +634,16 @@
         for (let k = 0; k < 3; k++) { const a = spin * 1.6 + k * 2.1; if (Math.cos(a) > 0) { ctx.beginPath(); ctx.ellipse(cx, base, w * .3, w * .05, 0, a - .35 - Math.PI / 2, a + .35 - Math.PI / 2); ctx.stroke(); } }
         ctx.restore();
       }
-      // sombra al final (la pieza ya en la mesa)
+      // repisa de madera donde queda la pieza terminada
+      if (g > 0) {
+        ctx.save(); ctx.globalAlpha = g; const sy = base + (1 - g) * w * .04;
+        ctx.fillStyle = '#C9A57A'; ctx.fillRect(w * .06, sy, w * .88, w * .035);
+        ctx.fillStyle = '#B48D62'; ctx.fillRect(w * .06, sy + w * .035, w * .88, w * .012);
+        ctx.fillStyle = 'rgba(255,240,215,.35)'; ctx.fillRect(w * .06, sy, w * .88, w * .004);
+        ctx.fillStyle = '#A9825A'; ctx.fillRect(w * .2, sy + w * .047, w * .03, w * .09); ctx.fillRect(w * .77, sy + w * .047, w * .03, w * .09);
+        ctx.restore();
+      }
+      // sombra al final (la pieza ya en la repisa)
       if (g > 0) { ctx.fillStyle = `rgba(80,45,25,${.16 * g})`; ctx.beginPath(); ctx.ellipse(cx, base + w * .006, R(0) * 1.25, R(0) * .2, 0, 0, Math.PI * 2); ctx.fill(); }
       // --- cuerpo de la pieza: silueta limpia con sombreado plano ---
       const N = 48, side = (sx, k0 = 1) => { const pts = []; for (let k = 0; k <= N; k++) { const u = k / N; pts.push([cx + sx * rAt(u) * k0, base - u * h]); } return pts; };
@@ -669,8 +681,13 @@
       const rt = R(K), ty = base - h;
       if (rt > 1) {
         ctx.fillStyle = rgb(top, 1.06); ctx.beginPath(); ctx.ellipse(cx, ty, rt, rt * .24, 0, 0, Math.PI * 2); ctx.fill();
-        if (o > .02) { ctx.fillStyle = rgb(mix(RAW, CLAY, g), .62, o); ctx.beginPath(); ctx.ellipse(cx, ty + rt * .01, rt * .84 * o, rt * .19 * o + .5, 0, 0, Math.PI * 2); ctx.fill();
-          ctx.fillStyle = rgb(mix(RAW, CLAY, g), .48, o); ctx.beginPath(); ctx.ellipse(cx, ty + rt * .05, rt * .7 * o, rt * .12 * o + .5, 0, Math.PI, Math.PI * 2); ctx.fill(); }
+        if (o > .02) {
+          // hueco: el borde de enfrente tapa el fondo; pared interior iluminada atrás, sombra adelante
+          const ir = rt * (.08 + .8 * o), iry = rt * .2 * o + .5, inner = mix(RAW, GLAZE, g);
+          const ig = ctx.createLinearGradient(0, ty - iry, 0, ty + iry);
+          ig.addColorStop(0, rgb(inner, .55)); ig.addColorStop(.55, rgb(inner, .4)); ig.addColorStop(1, rgb(inner, .78));
+          ctx.fillStyle = ig; ctx.beginPath(); ctx.ellipse(cx, ty + rt * .012, ir, iry, 0, 0, Math.PI * 2); ctx.fill();
+        }
       }
       // --- el sello de Terravita, estampado al final ---
       if (stamp > 0 && markPaths.length) {
