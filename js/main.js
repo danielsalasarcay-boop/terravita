@@ -564,11 +564,6 @@
     const rnd = (a => () => (a = (a * 16807) % 2147483647) / 2147483647)(7);
     const marks = Array.from({ length: 60 }, () => ({ a: rnd() * Math.PI * 2, u: .05 + rnd() * .9, s: .6 + rnd() * 1.4, d: rnd() > .5 }));
     const specks = Array.from({ length: 230 }, () => ({ a: rnd() * Math.PI * 2, u: .3 + rnd() * .7, s: .35 + rnd() * .9 }));
-    // Mano minimalista: una silueta (dedos juntos + pulgar) y una sombra suave
-    const HAND = {
-      body: new Path2D('M60 150 C 50 110, 48 70, 58 40 C 66 18, 98 10, 116 22 C 132 32, 136 60, 132 96 C 140 84, 152 80, 160 88 C 168 96, 160 116, 148 136 C 140 150, 136 166, 136 184 C 138 230, 150 270, 160 340 L 84 340 C 80 270, 72 200, 60 150 Z'),
-      shade: new Path2D('M132 96 C 128 120, 120 140, 118 160 C 116 180, 120 200, 124 230 C 120 196, 120 170, 124 150 C 126 136, 130 116, 132 96 Z'),
-    };
     const markPaths = $$('#mark path').map(p => new Path2D(p.getAttribute('d')));
     const markT = $('#mark g')?.getAttribute('transform') || '';
     const RAW = [201, 144, 104], CLAY = [170, 82, 44], GLAZE = [244, 232, 208];
@@ -676,24 +671,6 @@
         ctx.fillStyle = rgb(top, 1.06); ctx.beginPath(); ctx.ellipse(cx, ty, rt, rt * .24, 0, 0, Math.PI * 2); ctx.fill();
         if (o > .02) { ctx.fillStyle = rgb(mix(RAW, CLAY, g), .62, o); ctx.beginPath(); ctx.ellipse(cx, ty + rt * .01, rt * .84 * o, rt * .19 * o + .5, 0, 0, Math.PI * 2); ctx.fill();
           ctx.fillStyle = rgb(mix(RAW, CLAY, g), .48, o); ctx.beginPath(); ctx.ellipse(cx, ty + rt * .05, rt * .7 * o, rt * .12 * o + .5, 0, Math.PI, Math.PI * 2); ctx.fill(); }
-      }
-      // --- manos ilustradas que abrazan el barro ---
-      const handA = clamp(s / .5) * (1 - clamp((s - 4.05) / .35));
-      if (handA > 0) {
-        const press = Math.sin(time * 2.2) * w * .003;
-        // las manos abrazan la parte más ancha de la pieza
-        let bu = .4, br = 0; for (let u = .18; u <= .72; u += .02) { const r = rAt(u); if (r > br) { br = r; bu = u; } }
-        const hy = base - bu * h;
-        const out = (1 - handA) * w * .25, grip = w * .012;
-        hand(cx - br + grip - out + press, hy, -1, handA);
-        hand(cx + br - grip + out - press, hy, 1, handA);
-      }
-      function hand(x, y, dir, al) {
-        // Punto de contacto con el barro: borde izquierdo de los dedos (52, 96)
-        const k = w / 1000 * 1.05; ctx.save(); ctx.globalAlpha = al; ctx.translate(x, y); ctx.scale(dir * k, k); ctx.rotate(-.28); ctx.translate(-52, -96);
-        ctx.fillStyle = '#EDBE9A'; ctx.fill(HAND.body);
-        ctx.fillStyle = 'rgba(214,150,112,.55)'; ctx.fill(HAND.shade);
-        ctx.restore();
       }
       // --- el sello de Terravita, estampado al final ---
       if (stamp > 0 && markPaths.length) {
