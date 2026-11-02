@@ -533,6 +533,114 @@
       }, 2.0);
   }
 
+
+  // ------------------------------------------------------------------
+  // CONTACTO · El torno que crea el logo
+  // Anillos → cae el disco de barro y gira → el barro sube y forma la vasija (con las marcas del torno
+  // y gotas que salen despedidas) → se escribe "terra vita" → el horno brilla y pasa el esmalte →
+  // los canales llegan girando por la órbita. Avanza y retrocede con el scroll (como Cobertura de Caraqueña).
+  // ------------------------------------------------------------------
+  const kiln = $('.kiln');
+  let kilnTick = () => {};
+  if (kiln) {
+    const NS = 'http://www.w3.org/2000/svg';
+    const orbitSvg = $('.kiln__orbit', kiln), badge = $('.kiln__badge', kiln);
+    const disc = $('.kiln__disc', kiln), speck = $('.kiln__speck', kiln), pulse = $('.kiln__pulse', kiln);
+    const drawRings = $$('.k-ring:not(.k-ring--dash)', kiln), dashRing = $('.k-ring--dash', kiln);
+    const labels = $$('.k-label', kiln), ktext = $('.k-text', kiln);
+    const risePath = $('#kRisePath'), wordRect = $('#kWordRect'), ridges = $('.k-ridges', kiln);
+    const sats = $$('.k-sat', kiln);
+    const satTarget = [214, 193, 167, 146]; // grados (izquierda, frente a los botones)
+    // Gotas de barro
+    const dropsG = document.createElementNS(NS, 'g'); dropsG.setAttribute('class', 'k-drops');
+    orbitSvg.insertBefore(dropsG, $('.k-sats', orbitSvg));
+    const drops = Array.from({ length: 16 }, (_, i) => {
+      const c = document.createElementNS(NS, 'circle'); c.setAttribute('class', 'k-drop'); dropsG.appendChild(c);
+      return { c, a: (i * 137.5) % 360, s: 0.3 + (i % 8) * 0.032, r: 5 + (i * 7) % 9, d: 120 + (i * 53) % 110 };
+    });
+    // Brillo de esmalte que recorre la vasija
+    const defs = $('defs', badge);
+    defs.insertAdjacentHTML('beforeend', '<linearGradient id="kSheenG" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".75"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>');
+    const sheenG = document.createElementNS(NS, 'g'); sheenG.setAttribute('clip-path', 'url(#kMarkClip)');
+    sheenG.innerHTML = '<rect id="kSheen" x="-400" y="100" width="260" height="600" fill="url(#kSheenG)" transform="skewX(-18)"/>';
+    $('[clip-path="url(#kRise)"]', badge).appendChild(sheenG);
+    const sheen = $('#kSheen');
+
+    const eo = t => 1 - Math.pow(1 - t, 3);
+    const eio = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    const back = t => { const c = 1.6; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
+    let target = reduce ? 1 : 0, ps = target, time = 0;
+    ScrollTrigger.create({ trigger: kiln, start: 'top 85%', end: 'center 48%', onUpdate: s => { if (!reduce) target = s.progress; }, onRefresh: s => { if (!reduce) target = s.progress; } });
+
+    kilnTick = dt => {
+      const r0 = kiln.getBoundingClientRect();
+      if (r0.bottom < -200 || r0.top > innerHeight + 200) return;
+      time += dt;
+      ps = lerp(ps, target, 0.09);
+      const p = ps;
+      // 1 · anillos que se dibujan
+      drawRings.forEach((el, i) => { el.style.strokeDashoffset = (1 - eo(clamp((p - i * 0.035) / 0.24))).toFixed(4); });
+      const dr = eo(clamp((p - 0.06) / 0.2));
+      dashRing.style.opacity = (dr * 0.75).toFixed(3);
+      dashRing.style.transform = `rotate(${(-70 * (1 - dr) + time * 5).toFixed(2)}deg)`;
+      labels.forEach((el, i) => { el.style.opacity = clamp((p - 0.14 - i * 0.04) / 0.08).toFixed(3); });
+      // 2 · cae el disco de barro y gira (el torno)
+      const d = clamp((p - 0.12) / 0.16);
+      const ds = d <= 0 ? 0 : back(d);
+      disc.style.transform = badge.style.transform = `scale(${ds.toFixed(4)})`;
+      const spin = 1260 * eo(clamp((p - 0.12) / 0.62)) + time * 4;
+      speck.style.transform = `rotate(${spin.toFixed(2)}deg)`;
+      // 3 · el barro sube y forma la vasija, con borde ondulado
+      const rise = eio(clamp((p - 0.28) / 0.3));
+      const top = 1100 - rise * 960, amp = 26 * Math.pow(1 - rise, 0.6), ph = time * 5 + spin * 0.02;
+      let dpath = `M0 1080 L0 ${top.toFixed(1)}`;
+      for (let x = 0; x <= 1080; x += 45) dpath += ` L${x} ${(top + Math.sin(x / 70 + ph) * amp).toFixed(1)}`;
+      risePath.setAttribute('d', dpath + ' L1080 1080 Z');
+      ridges.style.transform = `translateY(${(-((time * 26 + spin * 0.4) % 34)).toFixed(2)}px)`;
+      ridges.style.opacity = rise > 0 ? (0.9 * (1 - clamp((p - 0.6) / 0.1))).toFixed(3) : 0;
+      // gotas despedidas por el giro
+      drops.forEach(o => {
+        const t = clamp((p - o.s) / 0.16);
+        const vis = t > 0 && t < 1;
+        o.c.style.opacity = vis ? Math.sin(Math.PI * t).toFixed(3) : 0;
+        if (!vis) return;
+        const a = (o.a + spin * 0.15 + t * 40) * Math.PI / 180, R = 300 + t * o.d;
+        o.c.setAttribute('cx', (500 + Math.cos(a) * R).toFixed(1));
+        o.c.setAttribute('cy', (500 + Math.sin(a) * R).toFixed(1));
+        o.c.setAttribute('r', (o.r * (1 - t * 0.5)).toFixed(1));
+      });
+      // 4 · se escribe "terra vita"
+      wordRect.setAttribute('width', (430 * eo(clamp((p - 0.58) / 0.14))).toFixed(1));
+      // 5 · el horno brilla y pasa el esmalte
+      const g1 = clamp((p - 0.7) / 0.08), g2 = clamp((p - 0.8) / 0.12);
+      kiln.style.setProperty('--glow', (g1 * (1 - g2 * 0.7)).toFixed(3));
+      const sh = clamp((p - 0.74) / 0.14);
+      sheen.setAttribute('x', (-500 + sh * 1700).toFixed(1));
+      sheen.style.opacity = sh > 0 && sh < 1 ? 1 : 0;
+      // 6 · los canales llegan girando por la órbita
+      sats.forEach((s, i) => {
+        const t = clamp((p - 0.78 - i * 0.035) / 0.13);
+        const ang = (lerp(320, satTarget[i], eo(t))) * Math.PI / 180;
+        const sc = t <= 0 ? 0 : back(t);
+        s.setAttribute('transform', `translate(${(500 + Math.cos(ang) * 410).toFixed(1)} ${(500 + Math.sin(ang) * 410).toFixed(1)}) scale(${sc.toFixed(3)})`);
+        s.style.opacity = clamp(t * 3).toFixed(3);
+      });
+      ktext.style.opacity = clamp((p - 0.9) / 0.08).toFixed(3);
+      ktext.style.transform = `rotate(${(-time * 5).toFixed(2)}deg)`;
+      pulse.classList.toggle('is-on', p > 0.97);
+    };
+    // Al pasar por un botón, su canal se enciende y una línea lo une
+    const rows = $$('.contact__row');
+    rows.forEach((row, i) => {
+      if (!sats[i]) return;
+      row.addEventListener('mouseenter', () => sats[i].classList.add('is-on'));
+      row.addEventListener('mouseleave', () => sats[i].classList.remove('is-on'));
+      row.addEventListener('focus', () => sats[i].classList.add('is-on'));
+      row.addEventListener('blur', () => sats[i].classList.remove('is-on'));
+      sats[i].addEventListener('click', () => row.click());
+    });
+  }
+
   // ------------------------------------------------------------------
   // Un solo reloj para todo lo continuo
   // ------------------------------------------------------------------
@@ -540,6 +648,7 @@
     const dt = Math.min(dms, 50) / 1000;
     wheelTick(dt);
     clayTick(dt);
+    kilnTick(dt);
     headerTick();
   });
 
