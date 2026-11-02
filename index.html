@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Terravita · Taller de arcilla y cerámica</title>
-  <meta name="description" content="Terravita es un taller de arcilla y cerámica: talleres, eventos, piezas por encargo y Terrashop. Crea, diseña y encuentra tus piezas favoritas.">
+  <meta name="description" content="Terravita es un taller de arcilla y cerámica: catálogo de piezas hechas a mano, eventos y clases semanales. Crea, diseña y encuentra tus piezas favoritas.">
   <meta name="theme-color" content="#96411B">
   <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="favicon.ico" sizes="any">
@@ -14,7 +14,7 @@
   <meta property="og:locale" content="es_VE">
   <meta property="og:site_name" content="Terravita">
   <meta property="og:title" content="Terravita · Taller de arcilla y cerámica">
-  <meta property="og:description" content="Crea, diseña y encuentra tus piezas favoritas. Talleres, eventos, encargos y Terrashop.">
+  <meta property="og:description" content="Crea, diseña y encuentra tus piezas favoritas. Catálogo, eventos y clases de cerámica.">
   <meta property="og:image" content="img/og.jpg">
   <meta name="twitter:card" content="summary_large_image">
 
@@ -65,26 +65,24 @@
       <svg class="header__word" viewBox="0 0 1585 1150"><use href="#word"/></svg>
     </a>
     <nav class="header__nav" aria-label="Principal">
-      <a href="#talleres">Talleres</a>
+      <a href="#catalogo">Catálogo</a>
       <a href="#eventos">Eventos</a>
-      <a href="#encargos">Encargos</a>
-      <a href="#terrashop">Terrashop</a>
+      <a href="#clases">Clases</a>
       <a href="#contacto">Contacto</a>
     </nav>
-    <a class="btn btn--pill header__cta" href="https://wa.me/584128270907" data-wa="¡Hola Terravita! Quiero reservar un taller." target="_blank" rel="noopener">
+    <a class="btn btn--small header__cta" href="https://wa.me/584128270907" data-wa="¡Hola Terravita! Quiero reservar una clase." target="_blank" rel="noopener">
       <span>Reservar</span>
     </a>
-    <button class="header__burger" id="burger" aria-label="Abrir menú" aria-expanded="false" aria-controls="menu"><i></i><i></i></button>
+    <button class="header__burger" id="burger" aria-label="Abrir menú" aria-expanded="false" aria-controls="menu"><span></span><span></span></button>
   </header>
 
   <!-- MENÚ MÓVIL -->
   <div class="menu" id="menu" aria-hidden="true">
     <nav class="menu__nav" aria-label="Menú">
-      <a href="#talleres"><span>01</span>Talleres</a>
+      <a href="#catalogo"><span>01</span>Catálogo</a>
       <a href="#eventos"><span>02</span>Eventos</a>
-      <a href="#encargos"><span>03</span>Encargos</a>
-      <a href="#terrashop"><span>04</span>Terrashop</a>
-      <a href="#contacto"><span>05</span>Contacto</a>
+      <a href="#clases"><span>03</span>Clases</a>
+      <a href="#contacto"><span>04</span>Contacto</a>
     </nav>
     <div class="menu__social">
       <a href="https://wa.me/584128270907" data-wa="¡Hola Terravita!" target="_blank" rel="noopener">WhatsApp</a>
@@ -106,8 +104,8 @@
             <span class="line"><span class="line__in">piezas <em>favoritas.</em></span></span>
           </h1>
           <div class="hero__actions">
-            <a class="btn btn--clay" href="#talleres"><span>Ver talleres</span></a>
-            <a class="btn btn--ghost" href="#terrashop"><span>Terrashop</span></a>
+            <a class="btn btn--clay" href="#catalogo"><span>Ver catálogo</span></a>
+            <a class="btn btn--ghost" href="#clases"><span>Clases</span></a>
           </div>
         </div>
 
@@ -115,14 +113,12 @@
         <div class="wheel" id="wheel" aria-hidden="true">
           <svg class="wheel__ring" viewBox="0 0 200 200">
             <defs><path id="ringPath" d="M100,100 m-92,0 a92,92 0 1,1 184,0 a92,92 0 1,1 -184,0"/></defs>
-            <text><textPath href="#ringPath">talleres · eventos · encargos · terrashop · hecho a mano ·&#160;</textPath></text>
+            <text><textPath href="#ringPath">catálogo · eventos · clases · hecho a mano · arcilla ·&#160;</textPath></text>
           </svg>
         </div>
 
         <div class="hero__reveal" id="reveal" aria-hidden="true">
-          <!-- FOTO PENDIENTE: manos en el torno (horizontal, mín. 2400px) -->
-          <div class="hero__media ph ph--deep" id="revealMedia"></div>
-          <span class="ph__tag hero__tag">Foto · manos en el torno</span>
+          <div class="hero__media ph ph--deep" id="revealMedia"><img src="img/fotos/torno-cenital.jpg" srcset="img/fotos/torno-cenital-m.jpg 900w, img/fotos/torno-cenital.jpg 1800w" sizes="100vw" alt="Vista cenital de un bowl de arcilla recién torneado sobre el torno, rodeado de virutas de barro" fetchpriority="high"></div>
           <div class="hero__shade"></div>
         </div>
 
@@ -136,60 +132,129 @@
       </div>
     </section>
 
-    <!-- TALLERES: lo principal. En escritorio la fila avanza de lado con el scroll; en el teléfono se desliza con el dedo -->
-    <section class="talleres" id="talleres">
+    <!-- 01 CATÁLOGO (estructura de las socias: jarrones / tazas / vajillas / etc.) -->
+    <section class="shop" id="catalogo">
+      <div class="container">
+        <div class="shop__head">
+          <div>
+            <span class="tag">01 — Catálogo</span>
+            <h2 class="display clay">Nuestras <em>piezas.</em></h2>
+          </div>
+          <p class="lead">Piezas artesanales hechas a mano, una a una, para darle un toque cálido a tus espacios favoritos. Cada rincón, un lugar con alma.</p>
+        </div>
+        <!-- CONFIRMAR: piezas, fotos y precios de cada categoría -->
+        <div class="products">
+          <article class="product" data-name="Jarrones">
+            <div class="product__media ph"><img src="img/fotos/jarrones-blancos.jpg" srcset="img/fotos/jarrones-blancos-m.jpg 900w, img/fotos/jarrones-blancos.jpg 1800w" sizes="(max-width: 899px) 45vw, 23vw" alt="Jarrones de cerámica blanca y gris" loading="lazy" decoding="async"></div>
+            <div class="product__info"><h3>Jarrones</h3><span>Formas orgánicas</span></div>
+          </article>
+          <article class="product" data-name="Tazas">
+            <div class="product__media ph"><img src="img/fotos/jarra-moteada.jpg" srcset="img/fotos/jarra-moteada-m.jpg 900w, img/fotos/jarra-moteada.jpg 1800w" sizes="(max-width: 899px) 45vw, 23vw" alt="Jarra de cerámica con esmalte moteado" loading="lazy" decoding="async" style="object-position:50% 62%"></div>
+            <div class="product__info"><h3>Tazas</h3><span>Para tu ritual diario</span></div>
+          </article>
+          <article class="product" data-name="Vajillas">
+            <div class="product__media ph"><img src="img/fotos/platos-torno.jpg" srcset="img/fotos/platos-torno-m.jpg 900w, img/fotos/platos-torno.jpg 1800w" sizes="(max-width: 899px) 45vw, 23vw" alt="Platos de arcilla torneados" loading="lazy" decoding="async"></div>
+            <div class="product__info"><h3>Vajillas</h3><span>Mesa con alma</span></div>
+          </article>
+          <article class="product" data-name="otras piezas">
+            <div class="product__media ph"><img src="img/fotos/repisa-piezas.jpg" srcset="img/fotos/repisa-piezas-m.jpg 900w, img/fotos/repisa-piezas.jpg 1800w" sizes="(max-width: 899px) 45vw, 23vw" alt="Repisa con jarrones, bowls y piezas escultóricas de Terravita" loading="lazy" decoding="async"></div>
+            <div class="product__info"><h3>Y mucho más</h3><span>Bowls, materas, esculturas</span></div>
+          </article>
+        </div>
+        <div class="shop__cta">
+          <a class="btn btn--clay" href="https://wa.me/584128270907" data-wa="¡Hola Terravita! Quiero ver el catálogo de piezas disponibles." target="_blank" rel="noopener"><span>Ver piezas disponibles</span></a>
+          <a class="btn btn--ghost" href="https://wa.me/584128270907" data-wa="¡Hola Terravita! Quiero encargar una pieza personalizada." target="_blank" rel="noopener"><span>Encargar una pieza</span></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 EVENTOS: tu próxima celebración + fotos + contáctanos -->
+    <section class="eventos" id="eventos">
+      <div class="container">
+        <div class="eventos__head">
+          <span class="tag tag--light">02 — Eventos</span>
+          <h2 class="display clay">Tu próxima <em>celebración…</em></h2>
+          <p class="lead">…con las manos en el barro. Organizamos cumpleaños, eventos corporativos, despedidas y cualquier ocasión que quieras celebrar distinto.</p>
+        </div>
+        <div class="eventos__grid">
+          <ul class="events">
+          <li class="event" data-src="img/fotos/clase-grupo-m.jpg">
+            <a href="https://wa.me/584128270907" data-wa="¡Hola Terravita! Quiero organizar un cumpleaños en el taller." target="_blank" rel="noopener">
+              <span class="event__num">01</span><span class="event__name">Cumpleaños</span><span class="event__desc">Para niños y grandes</span><span class="event__go" aria-hidden="true">→</span>
+            </a>
+          </li>
+          <li class="event" data-src="img/fotos/platos-torno-m.jpg">
+            <a href="https://wa.me/584128270907" data-wa="¡Hola Terravita! Quiero cotizar un evento corporativo." target="_blank" rel="noopener">
+              <span class="event__num">02</span><span class="event__name">Corporativos</span><span class="event__desc">Empresas y equipos</span><span class="event__go" aria-hidden="true">→</span>
+            </a>
+          </li>
+          <li class="event" data-src="img/fotos/vasijas-crudas-m.jpg">
+            <a href="https://wa.me/584128270907" data-wa="¡Hola Terravita! Quiero organizar una despedida en el taller." target="_blank" rel="noopener">
+              <span class="event__num">03</span><span class="event__name">Despedidas</span><span class="event__desc">Solteras, showers y más</span><span class="event__go" aria-hidden="true">→</span>
+            </a>
+          </li>
+          <li class="event" data-src="img/fotos/floreros-serie-m.jpg">
+            <a href="https://wa.me/584128270907" data-wa="¡Hola Terravita! Quiero información para un evento." target="_blank" rel="noopener">
+              <span class="event__num">04</span><span class="event__name">Y mucho más</span><span class="event__desc">Tu celebración, a tu medida</span><span class="event__go" aria-hidden="true">→</span>
+            </a>
+          </li>
+          </ul>
+          <!-- FOTOS DE EVENTOS PENDIENTES: por ahora, fotos del taller. Cambia con cada fila -->
+          <figure class="eventos__photo">
+            <div class="ph ph--deep"><img src="img/fotos/clase-grupo.jpg" srcset="img/fotos/clase-grupo-m.jpg 900w, img/fotos/clase-grupo.jpg 1800w" sizes="(max-width: 899px) 90vw, 40vw" alt="Grupo modelando arcilla en una mesa del taller" loading="lazy" decoding="async"><img class="eventos__next" alt="" aria-hidden="true"></div>
+          </figure>
+        </div>
+        <div class="eventos__cta">
+          <a class="btn btn--cream" href="https://wa.me/584128270907" data-wa="¡Hola Terravita! Quiero organizar un evento." target="_blank" rel="noopener"><span>Contáctanos</span></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 CLASES: descripción + clases semanales. En escritorio la fila avanza de lado con el scroll; en el teléfono se desliza con el dedo -->
+    <section class="talleres" id="clases">
       <div class="talleres__stage">
         <div class="talleres__inner" id="hscroll">
         <div class="talleres__head">
-          <span class="tag">01 — Talleres</span>
-          <h2 class="display clay"><span>Tus manos,</span> <em>el barro</em> <span>y una tarde para ti.</span></h2>
-          <p class="lead">Espacios diseñados para que explores, experimentes y descubras el placer de crear. No necesitas experiencia: solo ganas de ensuciarte las manos.</p>
+          <span class="tag">03 — Clases</span>
+          <h2 class="display clay"><span>Tus manos,</span> <em>el barro</em> <span>y un rato para ti.</span></h2>
+          <p class="lead">Un taller de arcilla dedicado a la creatividad y la expresión. Aprende torno y modelado a mano, a tu ritmo y con guía en cada paso. No necesitas experiencia.</p>
         </div>
         <div class="talleres__rail" id="rail">
           <div class="talleres__track" id="track">
-            <!-- CONFIRMAR: nombres, duración y detalles de cada taller con Terravita -->
+            <!-- CONFIRMAR: tipos de clase, días y horarios -->
+            <article class="card card--feature">
+              <div class="card__media ph"><img src="img/fotos/floreros-serie.jpg" srcset="img/fotos/floreros-serie-m.jpg 900w, img/fotos/floreros-serie.jpg 1800w" sizes="(max-width: 899px) 78vw, 25vw" alt="Serie de floreros torneados por alumnos" loading="lazy" decoding="async"></div>
+              <div class="card__body">
+                <span class="card__num">Cada semana</span>
+                <h3>Clases semanales</h3>
+                <p>Un horario fijo cada semana para avanzar pieza a pieza y ver tu progreso.</p>
+                <a class="card__link" href="https://wa.me/584128270907" data-wa="¡Hola Terravita! Quiero información de las clases semanales (días y horarios)." target="_blank" rel="noopener">Ver horarios <span aria-hidden="true">→</span></a>
+              </div>
+            </article>
             <article class="card">
-              <div class="card__media ph"><span class="ph__tag">Foto · torno</span></div>
+              <div class="card__media ph"><img src="img/fotos/manos-torno.jpg" srcset="img/fotos/manos-torno-m.jpg 900w, img/fotos/manos-torno.jpg 1800w" sizes="(max-width: 899px) 78vw, 25vw" alt="Manos con barro torneando una pieza en la rueda" loading="lazy" decoding="async"></div>
               <div class="card__body">
                 <span class="card__num">01</span>
                 <h3>Torno</h3>
                 <p>Centra el barro, ábrelo y levanta tu primera pieza en la rueda del alfarero.</p>
-                <a class="card__link" href="https://wa.me/584128270907" data-wa="¡Hola Terravita! Quiero reservar el taller de torno." target="_blank" rel="noopener">Reservar <span aria-hidden="true">→</span></a>
+                <a class="card__link" href="https://wa.me/584128270907" data-wa="¡Hola Terravita! Quiero reservar una clase de torno." target="_blank" rel="noopener">Reservar <span aria-hidden="true">→</span></a>
               </div>
             </article>
             <article class="card">
-              <div class="card__media ph ph--deep"><span class="ph__tag">Foto · modelado</span></div>
+              <div class="card__media ph"><img src="img/fotos/modelado-rodillo.jpg" srcset="img/fotos/modelado-rodillo-m.jpg 900w, img/fotos/modelado-rodillo.jpg 1800w" sizes="(max-width: 899px) 78vw, 25vw" alt="Alumna estirando una plancha de arcilla con rodillo" loading="lazy" decoding="async" style="object-position:50% 70%"></div>
               <div class="card__body">
                 <span class="card__num">02</span>
                 <h3>Modelado a mano</h3>
                 <p>Pellizco, churros y planchas: técnicas ancestrales para crear sin rueda.</p>
-                <a class="card__link" href="https://wa.me/584128270907" data-wa="¡Hola Terravita! Quiero reservar el taller de modelado a mano." target="_blank" rel="noopener">Reservar <span aria-hidden="true">→</span></a>
-              </div>
-            </article>
-            <article class="card">
-              <div class="card__media ph"><span class="ph__tag">Foto · esmaltes</span></div>
-              <div class="card__body">
-                <span class="card__num">03</span>
-                <h3>Pintura y esmaltado</h3>
-                <p>Dale color a tu pieza y descubre la magia de lo que pasa dentro del horno.</p>
-                <a class="card__link" href="https://wa.me/584128270907" data-wa="¡Hola Terravita! Quiero reservar el taller de pintura y esmaltado." target="_blank" rel="noopener">Reservar <span aria-hidden="true">→</span></a>
-              </div>
-            </article>
-            <article class="card">
-              <div class="card__media ph ph--deep"><span class="ph__tag">Foto · niños</span></div>
-              <div class="card__body">
-                <span class="card__num">04</span>
-                <h3>Pequeños ceramistas</h3>
-                <p>Barro, juego y creatividad para los más pequeños de la casa.</p>
-                <a class="card__link" href="https://wa.me/584128270907" data-wa="¡Hola Terravita! Quiero información del taller para niños." target="_blank" rel="noopener">Reservar <span aria-hidden="true">→</span></a>
+                <a class="card__link" href="https://wa.me/584128270907" data-wa="¡Hola Terravita! Quiero reservar una clase de modelado a mano." target="_blank" rel="noopener">Reservar <span aria-hidden="true">→</span></a>
               </div>
             </article>
             <article class="card card--end">
               <div class="card__body">
                 <svg class="card__mark" viewBox="0 0 1464 1736"><use href="#mark"/></svg>
                 <h3>¿Primera vez?</h3>
-                <p>Escríbenos y te ayudamos a escoger el taller ideal para ti.</p>
-                <a class="btn btn--cream" href="https://wa.me/584128270907" data-wa="¡Hola Terravita! Es mi primera vez, ¿qué taller me recomiendan?" target="_blank" rel="noopener"><span>Escríbenos</span></a>
+                <p>Escríbenos y te ayudamos a escoger la clase ideal para ti.</p>
+                <a class="btn btn--cream" href="https://wa.me/584128270907" data-wa="¡Hola Terravita! Es mi primera vez, ¿qué clase me recomiendan?" target="_blank" rel="noopener"><span>Escríbenos</span></a>
               </div>
             </article>
           </div>
@@ -199,140 +264,17 @@
       </div>
     </section>
 
-    <!-- EVENTOS: filas grandes; al pasar el cursor aparece la foto flotante -->
-    <section class="eventos" id="eventos">
-      <div class="container">
-        <div class="eventos__head">
-          <span class="tag tag--light">02 — Eventos</span>
-          <h2 class="display clay">Celebra con <em>las manos</em> en el barro.</h2>
-          <p class="lead">Llevamos el taller a tu celebración o la celebramos en el taller. Un plan distinto que todos recuerdan.</p>
-        </div>
-        <!-- CONFIRMAR: tipos de evento con Terravita -->
-        <ul class="events">
-          <li class="event" data-img="Cumpleaños">
-            <a href="https://wa.me/584128270907" data-wa="¡Hola Terravita! Quiero organizar un cumpleaños en el taller." target="_blank" rel="noopener">
-              <span class="event__num">01</span><span class="event__name">Cumpleaños</span><span class="event__desc">Para niños y grandes</span><span class="event__go" aria-hidden="true">→</span>
-            </a>
-          </li>
-          <li class="event" data-img="Equipos">
-            <a href="https://wa.me/584128270907" data-wa="¡Hola Terravita! Quiero cotizar un evento corporativo / team building." target="_blank" rel="noopener">
-              <span class="event__num">02</span><span class="event__name">Team building</span><span class="event__desc">Empresas y equipos</span><span class="event__go" aria-hidden="true">→</span>
-            </a>
-          </li>
-          <li class="event" data-img="Despedidas">
-            <a href="https://wa.me/584128270907" data-wa="¡Hola Terravita! Quiero organizar una despedida / baby shower." target="_blank" rel="noopener">
-              <span class="event__num">03</span><span class="event__name">Despedidas y showers</span><span class="event__desc">Una tarde para celebrar</span><span class="event__go" aria-hidden="true">→</span>
-            </a>
-          </li>
-          <li class="event" data-img="Parejas">
-            <a href="https://wa.me/584128270907" data-wa="¡Hola Terravita! Quiero reservar una cita en pareja en el taller." target="_blank" rel="noopener">
-              <span class="event__num">04</span><span class="event__name">Citas en pareja</span><span class="event__desc">Date night de barro</span><span class="event__go" aria-hidden="true">→</span>
-            </a>
-          </li>
-          <li class="event" data-img="Privados">
-            <a href="https://wa.me/584128270907" data-wa="¡Hola Terravita! Quiero información para un evento privado." target="_blank" rel="noopener">
-              <span class="event__num">05</span><span class="event__name">Eventos privados</span><span class="event__desc">A tu medida</span><span class="event__go" aria-hidden="true">→</span>
-            </a>
-          </li>
-        </ul>
-      </div>
-      <!-- Foto flotante que sigue al cursor (FOTOS PENDIENTES por evento) -->
-      <div class="eventos__float" aria-hidden="true"><div class="ph ph--light"><span class="ph__tag" id="floatTag">Foto</span></div></div>
-    </section>
-
-    <!-- ENCARGOS -->
-    <section class="encargos" id="encargos">
-      <div class="container encargos__grid">
-        <div class="encargos__media">
-          <!-- FOTO PENDIENTE: pieza por encargo (vertical) -->
-          <div class="ph ph--deep js-parallax"><span class="ph__tag">Foto · pieza por encargo</span></div>
-          <div class="encargos__badge" aria-hidden="true">
-            <svg viewBox="0 0 200 200"><defs><path id="badgePath" d="M100,100 m-74,0 a74,74 0 1,1 148,0 a74,74 0 1,1 -148,0"/></defs><text><textPath href="#badgePath">hecho a mano · pieza única · hecho a mano · pieza única · </textPath></text></svg>
-            <svg class="encargos__badge-mark" viewBox="0 0 1464 1736"><use href="#mark"/></svg>
-          </div>
-        </div>
-        <div class="encargos__copy">
-          <span class="tag">03 — Encargos</span>
-          <h2 class="display clay">Piezas <em>por encargo.</em></h2>
-          <p class="lead">Vajillas, regalos corporativos, recuerdos de boda o esa pieza que solo existe en tu cabeza. La diseñamos contigo y la hacemos a mano.</p>
-          <ol class="steps">
-            <li><span>01</span><div><h3>Nos cuentas tu idea</h3><p>Forma, uso, colores y cantidad.</p></div></li>
-            <li><span>02</span><div><h3>La diseñamos juntos</h3><p>Bocetos y muestras de esmalte.</p></div></li>
-            <li><span>03</span><div><h3>Modelamos y horneamos</h3><p>Cada pieza, hecha una a una.</p></div></li>
-            <li><span>04</span><div><h3>Lista para ti</h3><p>Única, como la imaginaste.</p></div></li>
-          </ol>
-          <a class="btn btn--clay" href="https://wa.me/584128270907" data-wa="¡Hola Terravita! Quiero encargar una pieza." target="_blank" rel="noopener"><span>Encargar una pieza</span></a>
-        </div>
-      </div>
-    </section>
-
-    <!-- TERRASHOP -->
-    <section class="shop" id="terrashop">
-      <div class="container">
-        <div class="shop__head">
-          <div>
-            <span class="tag">04 — Terrashop</span>
-            <h2 class="display clay">Terra<em>shop.</em></h2>
-          </div>
-          <p class="lead">Una cuidadosa selección de piezas artesanales para darle un toque cálido a tus espacios favoritos. Cada rincón, un lugar con alma.</p>
-        </div>
-        <!-- PRODUCTOS PENDIENTES: nombre, foto y precio de cada pieza -->
-        <div class="products">
-          <article class="product" data-name="Taza">
-            <div class="product__media ph"><span class="ph__tag">Foto</span></div>
-            <div class="product__info"><h3>Tazas</h3><span>Para tu ritual diario</span></div>
-          </article>
-          <article class="product" data-name="Bowl">
-            <div class="product__media ph ph--deep"><span class="ph__tag">Foto</span></div>
-            <div class="product__info"><h3>Bowls</h3><span>Para compartir</span></div>
-          </article>
-          <article class="product" data-name="Plato">
-            <div class="product__media ph"><span class="ph__tag">Foto</span></div>
-            <div class="product__info"><h3>Platos</h3><span>Mesa con alma</span></div>
-          </article>
-          <article class="product" data-name="Jarrón">
-            <div class="product__media ph ph--deep"><span class="ph__tag">Foto</span></div>
-            <div class="product__info"><h3>Jarrones</h3><span>Para tus flores</span></div>
-          </article>
-          <article class="product" data-name="Matera">
-            <div class="product__media ph"><span class="ph__tag">Foto</span></div>
-            <div class="product__info"><h3>Materas</h3><span>Hogar para tus plantas</span></div>
-          </article>
-          <article class="product" data-name="Bandeja">
-            <div class="product__media ph ph--deep"><span class="ph__tag">Foto</span></div>
-            <div class="product__info"><h3>Bandejas</h3><span>Los detalles</span></div>
-          </article>
-        </div>
-        <div class="shop__cta">
-          <a class="btn btn--clay" href="https://wa.me/584128270907" data-wa="¡Hola Terravita! Quiero ver las piezas disponibles en Terrashop." target="_blank" rel="noopener"><span>Ver piezas disponibles</span></a>
-          <a class="btn btn--ghost" href="https://www.instagram.com/taller_terravita/" target="_blank" rel="noopener"><span>Ver en Instagram</span></a>
-        </div>
-      </div>
-    </section>
-
     <!-- CONTACTO -->
     <section class="contact" id="contacto">
       <div class="container">
-        <span class="tag">05 — Contacto</span>
+        <span class="tag">04 — Contacto</span>
         <h2 class="contact__title clay"><span class="line"><span class="line__in">Ven a <em>ensuciarte</em></span></span><span class="line"><span class="line__in">las manos.</span></span></h2>
-        <div class="contact__grid">
-          <a class="chan" href="https://wa.me/584128270907" data-wa="¡Hola Terravita!" target="_blank" rel="noopener">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3a.5.5 0 0 0 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.3c0-.1-.2-.2-.4-.3Z"/></svg>
-            <span class="chan__label">WhatsApp</span><span class="chan__val">+58 412 827 0907</span>
-          </a>
-          <a class="chan" href="tel:+584241192157">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.2 11.4 11.4 0 0 0 3.6.6 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.2.2 2.5.6 3.6a1 1 0 0 1-.3 1Z"/></svg>
-            <span class="chan__label">Llámanos</span><span class="chan__val">+58 424 119 2157</span>
-          </a>
-          <a class="chan" href="https://www.instagram.com/taller_terravita/" target="_blank" rel="noopener">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10Zm0 8.2a3.2 3.2 0 1 1 0-6.4 3.2 3.2 0 0 1 0 6.4ZM17.3 5.5a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4ZM21.9 7.2a6 6 0 0 0-1.6-4.2A6 6 0 0 0 16 1.4C14.4 1.3 9.6 1.3 8 1.4A6 6 0 0 0 3.8 3 6 6 0 0 0 2.1 7.2c-.1 1.6-.1 6.4 0 8A6 6 0 0 0 3.7 19.4 6 6 0 0 0 8 21c1.6.1 6.4.1 8 0a6 6 0 0 0 4.2-1.6 6 6 0 0 0 1.6-4.2c.1-1.6.1-6.4.1-8Zm-2.2 9.7a3.2 3.2 0 0 1-1.8 1.8c-1.3.5-4.3.4-5.7.4s-4.4.1-5.7-.4a3.2 3.2 0 0 1-1.8-1.8c-.5-1.3-.4-4.3-.4-5.7s-.1-4.4.4-5.7A3.2 3.2 0 0 1 6.5 3.7c1.3-.5 4.3-.4 5.7-.4s4.4-.1 5.7.4a3.2 3.2 0 0 1 1.8 1.8c.5 1.3.4 4.3.4 5.7s.1 4.4-.4 5.7Z"/></svg>
-            <span class="chan__label">Instagram</span><span class="chan__val">@taller_terravita</span>
-          </a>
-          <a class="chan js-tiktok" href="https://www.tiktok.com/@terra_vita" target="_blank" rel="noopener">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.6 5.8A4.3 4.3 0 0 1 15.5 3h-3.1v12.4a2.6 2.6 0 1 1-1.8-2.5V9.7a5.7 5.7 0 1 0 4.9 5.7V9.1a7.4 7.4 0 0 0 4.3 1.4V7.4a4.3 4.3 0 0 1-3.2-1.6Z"/></svg>
-            <span class="chan__label">TikTok</span><span class="chan__val">@terra_vita</span>
-          </a>
-        </div>
+        <ul class="contact__list">
+          <li><a class="contact__row" href="https://wa.me/584128270907" data-wa="¡Hola Terravita!" target="_blank" rel="noopener"><span class="contact__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4.2 19.8l1.1-3.9A8.3 8.3 0 1 1 8.4 19l-4.2.8z"/><path d="M9.2 8.3c.2-.4.5-.4.7-.4h.5c.2 0 .4 0 .5.4l.7 1.7c.1.2 0 .4-.1.6l-.5.6c.6 1.1 1.5 2 2.6 2.6l.6-.5c.2-.2.4-.2.6-.1l1.7.7c.3.1.4.3.4.5v.5c0 .3 0 .5-.4.7-.5.3-1.3.5-2 .3-2.6-.8-4.6-2.8-5.4-5.4-.2-.7 0-1.5.3-2z"/></svg></span><span class="contact__label">WhatsApp</span><span class="contact__val">+58 412 827 0907</span><span class="contact__go" aria-hidden="true">↗</span></a></li>
+          <li><a class="contact__row" href="tel:+584241192157"><span class="contact__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 4h3.2l1.6 4-2 1.3a10.5 10.5 0 0 0 4.9 4.9l1.3-2 4 1.6V17a2 2 0 0 1-2 2A15 15 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg></span><span class="contact__label">Llámanos</span><span class="contact__val">+58 424 119 2157</span><span class="contact__go" aria-hidden="true">↗</span></a></li>
+          <li><a class="contact__row" href="https://www.instagram.com/taller_terravita/" target="_blank" rel="noopener"><span class="contact__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r=".6"/></svg></span><span class="contact__label">Instagram</span><span class="contact__val">@taller_terravita</span><span class="contact__go" aria-hidden="true">↗</span></a></li>
+          <li><a class="contact__row js-tiktok" href="https://www.tiktok.com/@terra_vita" target="_blank" rel="noopener"><span class="contact__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M14 3.5v11.2a3.3 3.3 0 1 1-3.3-3.3"/><path d="M14 3.5c.4 2.6 2.2 4.4 5 4.7"/></svg></span><span class="contact__label">TikTok</span><span class="contact__val">@terra_vita</span><span class="contact__go" aria-hidden="true">↗</span></a></li>
+        </ul>
       </div>
     </section>
   </main>
@@ -342,11 +284,12 @@
     <div class="container footer__top">
       <div class="footer__contact">
         <p class="footer__label">Taller de arcilla y cerámica</p>
-        <a class="footer__big" href="https://wa.me/584128270907" data-wa="¡Hola Terravita!" target="_blank" rel="noopener">WhatsApp +58 412 827 0907</a>
-        <a class="footer__big" href="tel:+584241192157">Llamar +58 424 119 2157</a>
+        <a class="footer__big" href="https://wa.me/584128270907" data-wa="¡Hola Terravita!" target="_blank" rel="noopener"><span class="footer__k">WhatsApp</span> +58 412 827 0907 <i aria-hidden="true">↗</i></a>
+        <a class="footer__big" href="tel:+584241192157"><span class="footer__k">Llamar</span> +58 424 119 2157 <i aria-hidden="true">↗</i></a>
+        <a class="footer__big" href="https://www.instagram.com/taller_terravita/" target="_blank" rel="noopener"><span class="footer__k">Instagram</span> @taller_terravita <i aria-hidden="true">↗</i></a>
       </div>
       <nav class="footer__nav" aria-label="Pie de página">
-        <a href="#talleres">Talleres</a><a href="#eventos">Eventos</a><a href="#encargos">Encargos</a><a href="#terrashop">Terrashop</a><a href="https://www.instagram.com/taller_terravita/" target="_blank" rel="noopener">Instagram</a><a class="js-tiktok" href="https://www.tiktok.com/@terra_vita" target="_blank" rel="noopener">TikTok</a>
+        <a href="#catalogo">Catálogo</a><a href="#eventos">Eventos</a><a href="#clases">Clases</a><a href="#contacto">Contacto</a><a href="https://www.instagram.com/taller_terravita/" target="_blank" rel="noopener">Instagram</a><a class="js-tiktok" href="https://www.tiktok.com/@terra_vita" target="_blank" rel="noopener">TikTok</a>
       </nav>
     </div>
     <div class="footer__logo" aria-label="Terravita">
@@ -362,14 +305,18 @@
     </div>
   </footer>
 
-  <!-- Botones flotantes permanentes: Instagram y WhatsApp -->
-  <div class="fabs">
-  <a class="fab fab--ig" href="https://www.instagram.com/taller_terravita/" target="_blank" rel="noopener" aria-label="Síguenos en Instagram">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10Zm0 8.2a3.2 3.2 0 1 1 0-6.4 3.2 3.2 0 0 1 0 6.4ZM17.3 5.5a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4ZM21.9 7.2a6 6 0 0 0-1.6-4.2A6 6 0 0 0 16 1.4C14.4 1.3 9.6 1.3 8 1.4A6 6 0 0 0 3.8 3 6 6 0 0 0 2.1 7.2c-.1 1.6-.1 6.4 0 8A6 6 0 0 0 3.7 19.4 6 6 0 0 0 8 21c1.6.1 6.4.1 8 0a6 6 0 0 0 4.2-1.6 6 6 0 0 0 1.6-4.2c.1-1.6.1-6.4.1-8Zm-2.2 9.7a3.2 3.2 0 0 1-1.8 1.8c-1.3.5-4.3.4-5.7.4s-4.4.1-5.7-.4a3.2 3.2 0 0 1-1.8-1.8c-.5-1.3-.4-4.3-.4-5.7s-.1-4.4.4-5.7A3.2 3.2 0 0 1 6.5 3.7c1.3-.5 4.3-.4 5.7-.4s4.4-.1 5.7.4a3.2 3.2 0 0 1 1.8 1.8c.5 1.3.4 4.3.4 5.7s.1 4.4-.4 5.7Z"/></svg>
-  </a>
-  <a class="fab fab--wa" href="https://wa.me/584128270907" data-wa="¡Hola Terravita!" target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3a.5.5 0 0 0 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.3c0-.1-.2-.2-.4-.3Z"/></svg>
-  </a>
+  <!-- Botones flotantes permanentes (como Caraqueña): Instagram y WhatsApp -->
+  <div class="float">
+    <a class="float__btn float__btn--ig" href="https://www.instagram.com/taller_terravita/" target="_blank" rel="noopener" aria-label="Instagram de Terravita (se abre en una pestaña nueva)">
+      <span class="float__wave"></span>
+      <span class="float__label">Síguenos</span>
+      <span class="float__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></span>
+    </a>
+    <a class="float__btn float__btn--wa" href="https://wa.me/584128270907" data-wa="¡Hola Terravita!" target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp (se abre en una pestaña nueva)">
+      <span class="float__wave"></span><span class="float__wave float__wave--2"></span>
+      <span class="float__label">Escríbenos</span>
+      <span class="float__icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3a.5.5 0 0 0 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.3c0-.1-.2-.2-.4-.3Z"/></svg></span>
+    </a>
   </div>
 
   <div class="grain" aria-hidden="true"></div>

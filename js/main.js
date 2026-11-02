@@ -39,13 +39,19 @@
     p.appendChild(a);
   });
 
+  // Botones (como Caraqueña): el texto rueda hacia arriba y aparece una flecha
+  $$('.btn > span:only-child').forEach(label => {
+    const t = label.textContent;
+    label.outerHTML = `<span class="btn__roll"><span>${t}</span><span aria-hidden="true">${t}</span></span><span class="btn__arrow" aria-hidden="true">→</span>`;
+  });
+
   const year = $('#year'); if (year) year.textContent = new Date().getFullYear();
 
   // Sin librerías (CDN caído): mostrar el sitio tal cual
   if (!window.gsap || !window.ScrollTrigger) {
     document.body.classList.remove('is-loading');
     $('#loader')?.remove();
-    $('.fabs')?.classList.add('is-in');
+    $('.float')?.classList.add('is-in');
     return;
   }
   gsap.registerPlugin(ScrollTrigger);
@@ -234,7 +240,7 @@
   // ------------------------------------------------------------------
   let spin = 0, spinBoost = 0;
   // Ajusta el espaciado para que el texto cierre el círculo exacto
-  const fitRing = () => [[ring, 92], [$('.encargos__badge > svg'), 74]].forEach(([svg, r]) => {
+  const fitRing = () => [[ring, 92]].forEach(([svg, r]) => {
     const tp = $('textPath', svg);
     tp.setAttribute('textLength', (2 * Math.PI * r - 1).toFixed(1));
     tp.setAttribute('lengthAdjust', 'spacing');
@@ -295,7 +301,7 @@
   // ------------------------------------------------------------------
   const mm = gsap.matchMedia();
   mm.add('(min-width: 900px) and (hover: hover)', () => {
-    const section = $('#talleres');
+    const section = $('#clases');
     const inner = $('#hscroll');
     const bar = $('#railBar');
     const track = $('#track');
@@ -321,81 +327,68 @@
   });
 
   // ------------------------------------------------------------------
-  // Eventos: foto flotante que sigue el cursor
+  // Eventos: la foto de al lado cambia con cada fila (cursor o toque)
   // ------------------------------------------------------------------
-  if (fine && innerWidth >= 900) {
-    const float = $('.eventos__float');
-    const tag = $('#floatTag');
-    const fx = gsap.quickTo(float, 'x', { duration: 0.6, ease: 'power3.out' });
-    const fy = gsap.quickTo(float, 'y', { duration: 0.6, ease: 'power3.out' });
-    const fr = gsap.quickTo(float, 'rotation', { duration: 0.8, ease: 'power3.out' });
-    let px = 0, shown = false;
-    // La foto va al lado del cursor y nunca se sale de la pantalla (antes, en "Eventos privados" quedaba cortada abajo)
-    const place = (cx, cy, instant) => {
-      const w = float.offsetWidth, h = float.offsetHeight, m = 20;
-      const x = clamp(cx + 40, m, innerWidth - w - m - 70);
-      const y = clamp(cy - h / 2, 90, innerHeight - h - m);
-      if (instant) { gsap.set(float, { x, y }); fx.tween?.kill(); fy.tween?.kill(); fx(x); fy(y); }
-      else { fx(x); fy(y); }
+  {
+    const frame = $('.eventos__photo .ph');
+    const base = $('img', frame);
+    const next = $('.eventos__next', frame);
+    let current = base.currentSrc || base.src;
+    $$('.event').forEach(ev => { const i = new Image(); i.src = ev.dataset.src; }); // precarga
+    const show = src => {
+      if (!src || current.endsWith(src)) return;
+      current = src;
+      gsap.killTweensOf(next);
+      next.src = src;
+      gsap.fromTo(next, { opacity: 0, scale: 1.08 }, { opacity: 1, scale: 1, duration: 0.7, ease: 'expo.out', onComplete: () => {
+        base.removeAttribute('srcset'); base.src = src; gsap.set(next, { opacity: 0 });
+      } });
     };
-    const hide = () => { if (!shown) return; shown = false; gsap.to(float, { autoAlpha: 0, scale: 0.7, duration: 0.35, ease: 'power3.in', overwrite: 'auto' }); };
     $$('.event').forEach(ev => {
-      ev.addEventListener('mouseenter', e => {
-        tag.textContent = `Foto · ${ev.dataset.img}`;
-        if (!shown) place(e.clientX, e.clientY, true);
-        shown = true;
-        gsap.to(float, { autoAlpha: 1, scale: 1, duration: 0.5, ease: 'expo.out', overwrite: 'auto' });
-      });
+      ev.addEventListener('mouseenter', () => show(ev.dataset.src));
+      ev.addEventListener('focusin', () => show(ev.dataset.src));
     });
-    $('.events').addEventListener('mouseleave', hide);
-    $('.events').addEventListener('mousemove', e => {
-      place(e.clientX, e.clientY);
-      fr(clamp((e.clientX - px) * 0.4, -8, 8)); px = e.clientX;
-    });
-    // Si la página se mueve con la rueda y el cursor queda fuera de la lista, se esconde
-    addEventListener('scroll', () => {
-      if (!shown) return;
-      const r = $('.events').getBoundingClientRect();
-      if (pointer.y < r.top || pointer.y > r.bottom) hide();
-    }, { passive: true });
+    // En el teléfono: cambia según la fila que está en el centro de la pantalla
+    if (!fine) {
+      const rowIO = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) show(e.target.dataset.src); }), { rootMargin: '-45% 0px -45% 0px' });
+      $$('.event').forEach(ev => rowIO.observe(ev));
+    }
   }
 
   // ------------------------------------------------------------------
   // Apariciones al hacer scroll
   // ------------------------------------------------------------------
+  function onVisible(el, fn) {
+    const o = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { o.disconnect(); fn(); } }, { rootMargin: '0px 0px -12% 0px' });
+    o.observe(el);
+  }
+
   function scrollReveals() {
     // Títulos: las letras suben y pasa una ola de "barro"
     clayGroups.filter(g => !g.el.classList.contains('hero__title')).forEach(g => {
       const chars = g.st.map(s => s.ch);
       gsap.set(chars, { yPercent: 70, opacity: 0 });
-      ScrollTrigger.create({
-        trigger: g.el, start: 'top 85%', once: true,
-        onEnter: () => {
-          gsap.to(chars, { yPercent: 0, opacity: 1, duration: 1.1, ease: 'expo.out', stagger: 0.018 });
-          const o = { v: -0.3 };
-          gsap.to(o, { v: 1.3, duration: 1.8, ease: 'power1.inOut', delay: 0.1, onUpdate: () => { g.wave = o.v; }, onComplete: () => { g.wave = -1; } });
-        },
+      onVisible(g.el, () => {
+        gsap.to(chars, { yPercent: 0, opacity: 1, duration: 1.1, ease: 'expo.out', stagger: 0.018 });
+        const o = { v: -0.3 };
+        gsap.to(o, { v: 1.3, duration: 1.8, ease: 'power1.inOut', delay: 0.1, onUpdate: () => { g.wave = o.v; }, onComplete: () => { g.wave = -1; } });
       });
     });
 
-    const groups = ['.lead', '.tag', '.steps li', '.product', '.chan', '.footer__contact', '.footer__nav', '.shop__cta', '.encargos__copy > .btn', '.event'];
+    const groups = ['.lead', '.tag', '.product', '.contact__row', '.footer__contact', '.footer__nav', '.shop__cta', '.eventos__photo', '.eventos__cta', '.event'];
     if (!matchMedia('(min-width: 900px) and (hover: hover)').matches) groups.push('.card');
     const els = $$(groups.join(',')).filter(el => !el.closest('.hero'));
     gsap.set(els, { y: 40, opacity: 0 });
-    ScrollTrigger.batch(els, {
-      start: 'top 90%', once: true,
-      onEnter: b => gsap.to(b, { y: 0, opacity: 1, duration: 1.1, ease: 'expo.out', stagger: 0.08, overwrite: true }),
-    });
+    // Aparecen en grupos cuando entran de verdad en pantalla (IntersectionObserver: no depende de posiciones calculadas)
+    let queue = [], qTimer = 0;
+    const revealIO = new IntersectionObserver(es => {
+      es.forEach(e => { if (e.isIntersecting) { queue.push(e.target); revealIO.unobserve(e.target); } });
+      clearTimeout(qTimer);
+      qTimer = setTimeout(() => { gsap.to(queue, { y: 0, opacity: 1, duration: 1.1, ease: 'expo.out', stagger: 0.08, overwrite: true }); queue = []; }, 30);
+    }, { rootMargin: '0px 0px -8% 0px' });
+    els.forEach(el => revealIO.observe(el));
 
-    // Foto de encargos con parallax y entrada en arco
-    const encPh = $('.encargos__media > .ph');
-    gsap.fromTo(encPh, { clipPath: 'inset(100% 0 0 0 round 240px 240px 22px 22px)' }, {
-      clipPath: 'inset(0% 0 0 0 round 240px 240px 22px 22px)', duration: 1.6, ease: 'expo.inOut',
-      scrollTrigger: { trigger: encPh, start: 'top 80%', once: true },
-    });
-    gsap.fromTo(encPh, { y: 60 }, { y: -60, ease: 'none', scrollTrigger: { trigger: '.encargos', start: 'top bottom', end: 'bottom top', scrub: true } });
-
-    // Terrashop: la hoja crema sube sobre la página
+    // Catálogo: la hoja crema sube sobre la página
     gsap.from('.shop', { borderRadius: '120px 120px 0 0', ease: 'none', scrollTrigger: { trigger: '.shop', start: 'top bottom', end: 'top 30%', scrub: true } });
 
     // Footer: la vasija gira hasta su sitio y la marca sube
@@ -454,7 +447,7 @@
         loader.remove();
         document.body.classList.remove('is-loading');
         lenis?.start();
-        $('.fabs').classList.add('is-in');
+        $('.float').classList.add('is-in');
         // La ola de bienvenida en el título
         const g = clayGroups.find(g => g.el.classList.contains('hero__title'));
         const o = { v: -0.3 };
@@ -476,4 +469,12 @@
   renderHero(0);
   scrollReveals();
   addEventListener('resize', () => { measureHero(); renderHero(heroST.progress); });
+  // Si el alto de la página cambia (fuentes, giro del teléfono, fotos que cargan), se recalculan las posiciones
+  let lastH = 0, rT = 0;
+  new ResizeObserver(() => {
+    const h = document.body.scrollHeight;
+    if (Math.abs(h - lastH) < 2) return;
+    lastH = h; clearTimeout(rT); rT = setTimeout(() => ScrollTrigger.refresh(), 150);
+  }).observe(document.body);
+  addEventListener('orientationchange', () => setTimeout(() => ScrollTrigger.refresh(), 350));
 })();
