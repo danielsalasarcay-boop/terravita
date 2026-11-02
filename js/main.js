@@ -535,110 +535,186 @@
 
 
   // ------------------------------------------------------------------
-  // CONTACTO · El torno que crea el logo
-  // Anillos → cae el disco de barro y gira → el barro sube y forma la vasija (con las marcas del torno
-  // y gotas que salen despedidas) → se escribe "terra vita" → el horno brilla y pasa el esmalte →
-  // los canales llegan girando por la órbita. Avanza y retrocede con el scroll (como Cobertura de Caraqueña).
+  // CONTACTO · Del barro a tu pieza
+  // Una pieza dibujada en 3D (torno = sólido de revolución) que se transforma con el scroll:
+  // puñado de barro → centrado → bowl → taza → jarrón → horno, esmalte "sumergido" y el sello de Terravita.
+  // La luz sigue al cursor; al pasar por un botón de contacto, el torno se acelera.
   // ------------------------------------------------------------------
-  const kiln = $('.kiln');
-  let kilnTick = () => {};
-  if (kiln) {
-    const NS = 'http://www.w3.org/2000/svg';
-    const orbitSvg = $('.kiln__orbit', kiln), badge = $('.kiln__badge', kiln);
-    const disc = $('.kiln__disc', kiln), speck = $('.kiln__speck', kiln), pulse = $('.kiln__pulse', kiln);
-    const drawRings = $$('.k-ring:not(.k-ring--dash)', kiln), dashRing = $('.k-ring--dash', kiln);
-    const labels = $$('.k-label', kiln), ktext = $('.k-text', kiln);
-    const risePath = $('#kRisePath'), wordRect = $('#kWordRect'), ridges = $('.k-ridges', kiln);
-    const sats = $$('.k-sat', kiln);
-    const satTarget = [214, 193, 167, 146]; // grados (izquierda, frente a los botones)
-    // Gotas de barro
-    const dropsG = document.createElementNS(NS, 'g'); dropsG.setAttribute('class', 'k-drops');
-    orbitSvg.insertBefore(dropsG, $('.k-sats', orbitSvg));
-    const drops = Array.from({ length: 16 }, (_, i) => {
-      const c = document.createElementNS(NS, 'circle'); c.setAttribute('class', 'k-drop'); dropsG.appendChild(c);
-      return { c, a: (i * 137.5) % 360, s: 0.3 + (i % 8) * 0.032, r: 5 + (i * 7) % 9, d: 120 + (i * 53) % 110 };
-    });
-    // Brillo de esmalte que recorre la vasija
-    const defs = $('defs', badge);
-    defs.insertAdjacentHTML('beforeend', '<linearGradient id="kSheenG" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".75"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>');
-    const sheenG = document.createElementNS(NS, 'g'); sheenG.setAttribute('clip-path', 'url(#kMarkClip)');
-    sheenG.innerHTML = '<rect id="kSheen" x="-400" y="100" width="260" height="600" fill="url(#kSheenG)" transform="skewX(-18)"/>';
-    $('[clip-path="url(#kRise)"]', badge).appendChild(sheenG);
-    const sheen = $('#kSheen');
+  const pieceEl = $('.piece');
+  let pieceTick = () => {};
+  if (pieceEl) {
+    const cv = $('.piece__canvas', pieceEl), ctx = cv.getContext('2d');
+    const caps = $$('.piece__cap', pieceEl), steps = $$('.piece__steps i', pieceEl);
+    const K = 64;
+    // Perfiles: [u (0 = base, 1 = boca), radio] — h = alto, o = qué tan abierta está la boca
+    const P = [
+      { h: .30, o: 0, pts: [[0, .20], [.15, .27], [.38, .30], [.62, .26], [.82, .17], [.94, .08], [1, 0]] },     // puñado de barro
+      { h: .21, o: 0, pts: [[0, .35], [.5, .355], [.78, .345], [.92, .31], [1, .26]] },                         // centrado
+      { h: .25, o: 1, pts: [[0, .15], [.1, .19], [.35, .27], [.65, .33], [.88, .365], [1, .375]] },               // bowl
+      { h: .40, o: 1, pts: [[0, .17], [.06, .2], [.25, .215], [.55, .225], [.85, .22], [1, .225]] },              // taza
+      { h: .62, o: 1, pts: [[0, .16], [.12, .23], [.32, .275], [.55, .21], [.75, .11], [.86, .085], [.95, .1], [1, .12]] }, // jarrón
+    ];
+    const sample = s => { const out = new Float32Array(K + 1);
+      for (let k = 0; k <= K; k++) { const u = k / K; let i = 0; while (i < s.pts.length - 2 && u > s.pts[i + 1][0]) i++;
+        const [u0, r0] = s.pts[i], [u1, r1] = s.pts[i + 1]; const t = clamp((u - u0) / (u1 - u0)); const e = (1 - Math.cos(t * Math.PI)) / 2;
+        out[k] = r0 + (r1 - r0) * e; }
+      return out; };
+    P.forEach(s => { s.r = sample(s); });
+    // Marcas del barro y motas del esmalte (ángulo, altura)
+    const rnd = (a => () => (a = (a * 16807) % 2147483647) / 2147483647)(7);
+    const marks = Array.from({ length: 60 }, () => ({ a: rnd() * Math.PI * 2, u: .05 + rnd() * .9, s: .6 + rnd() * 1.4, d: rnd() > .5 }));
+    const specks = Array.from({ length: 230 }, () => ({ a: rnd() * Math.PI * 2, u: .3 + rnd() * .7, s: .35 + rnd() * .9 }));
+    const markPaths = $$('#mark path').map(p => new Path2D(p.getAttribute('d')));
+    const markT = $('#mark g')?.getAttribute('transform') || '';
+    const RAW = [201, 144, 104], CLAY = [170, 82, 44], GLAZE = [244, 232, 208];
+    const mix = (a, b, t) => [0, 1, 2].map(i => a[i] + (b[i] - a[i]) * t);
+    const rgb = (c, k = 1, al = 1) => `rgba(${c[0] * k | 0},${c[1] * k | 0},${c[2] * k | 0},${al})`;
+    let W = 0, dpr = 1, target = reduce ? 1 : 0, ps = target, spin = 0, boost = 0, lx = .3, lxT = .3, time = 0, lastCap = -1;
+    const size = () => { dpr = Math.min(2, devicePixelRatio || 1); const r = cv.getBoundingClientRect(); W = Math.round(r.width * dpr); cv.width = cv.height = W; };
+    size(); addEventListener('resize', size);
+    const desk = matchMedia('(min-width: 900px)');
+    const mk = () => desk.matches
+      ? ScrollTrigger.create({ trigger: '#contacto', start: 'top top', end: 'bottom bottom', onUpdate: s => { target = s.progress; }, onRefresh: s => { target = s.progress; } })
+      : ScrollTrigger.create({ trigger: pieceEl, start: 'top 90%', end: 'bottom 15%', onUpdate: s => { target = s.progress; }, onRefresh: s => { target = s.progress; } });
+    let st = reduce ? null : mk();
+    desk.addEventListener?.('change', () => { st?.kill(); st = reduce ? null : mk(); ScrollTrigger.refresh(); });
+    if (fine) pieceEl.addEventListener('pointermove', e => { const r = cv.getBoundingClientRect(); lxT = clamp(((e.clientX - r.left) / r.width) * 2 - 1, -1, 1); });
+    $$('.contact__row').forEach(row => { row.addEventListener('mouseenter', () => { boost = 1; }); row.addEventListener('mouseleave', () => { boost = 0; }); });
 
-    const eo = t => 1 - Math.pow(1 - t, 3);
-    const eio = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-    const back = t => { const c = 1.6; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
-    let target = reduce ? 1 : 0, ps = target, time = 0;
-    ScrollTrigger.create({ trigger: kiln, start: 'top 85%', end: 'center 48%', onUpdate: s => { if (!reduce) target = s.progress; }, onRefresh: s => { if (!reduce) target = s.progress; } });
-
-    kilnTick = dt => {
-      const r0 = kiln.getBoundingClientRect();
-      if (r0.bottom < -200 || r0.top > innerHeight + 200) return;
+    pieceTick = dt => {
+      const r0 = cv.getBoundingClientRect();
+      if (r0.bottom < -100 || r0.top > innerHeight + 100 || !W) return;
       time += dt;
-      ps = lerp(ps, target, 0.09);
-      const p = ps;
-      // 1 · anillos que se dibujan
-      drawRings.forEach((el, i) => { el.style.strokeDashoffset = (1 - eo(clamp((p - i * 0.035) / 0.24))).toFixed(4); });
-      const dr = eo(clamp((p - 0.06) / 0.2));
-      dashRing.style.opacity = (dr * 0.75).toFixed(3);
-      dashRing.style.transform = `rotate(${(-70 * (1 - dr) + time * 5).toFixed(2)}deg)`;
-      labels.forEach((el, i) => { el.style.opacity = clamp((p - 0.14 - i * 0.04) / 0.08).toFixed(3); });
-      // 2 · cae el disco de barro y gira (el torno)
-      const d = clamp((p - 0.12) / 0.16);
-      const ds = d <= 0 ? 0 : back(d);
-      disc.style.transform = badge.style.transform = `scale(${ds.toFixed(4)})`;
-      const spin = 1260 * eo(clamp((p - 0.12) / 0.62)) + time * 4;
-      speck.style.transform = `rotate(${spin.toFixed(2)}deg)`;
-      // 3 · el barro sube y forma la vasija, con borde ondulado
-      const rise = eio(clamp((p - 0.28) / 0.3));
-      const top = 1100 - rise * 960, amp = 26 * Math.pow(1 - rise, 0.6), ph = time * 5 + spin * 0.02;
-      let dpath = `M0 1080 L0 ${top.toFixed(1)}`;
-      for (let x = 0; x <= 1080; x += 45) dpath += ` L${x} ${(top + Math.sin(x / 70 + ph) * amp).toFixed(1)}`;
-      risePath.setAttribute('d', dpath + ' L1080 1080 Z');
-      ridges.style.transform = `translateY(${(-((time * 26 + spin * 0.4) % 34)).toFixed(2)}px)`;
-      ridges.style.opacity = rise > 0 ? (0.9 * (1 - clamp((p - 0.6) / 0.1))).toFixed(3) : 0;
-      // gotas despedidas por el giro
-      drops.forEach(o => {
-        const t = clamp((p - o.s) / 0.16);
-        const vis = t > 0 && t < 1;
-        o.c.style.opacity = vis ? Math.sin(Math.PI * t).toFixed(3) : 0;
-        if (!vis) return;
-        const a = (o.a + spin * 0.15 + t * 40) * Math.PI / 180, R = 300 + t * o.d;
-        o.c.setAttribute('cx', (500 + Math.cos(a) * R).toFixed(1));
-        o.c.setAttribute('cy', (500 + Math.sin(a) * R).toFixed(1));
-        o.c.setAttribute('r', (o.r * (1 - t * 0.5)).toFixed(1));
-      });
-      // 4 · se escribe "terra vita"
-      wordRect.setAttribute('width', (430 * eo(clamp((p - 0.58) / 0.14))).toFixed(1));
-      // 5 · el horno brilla y pasa el esmalte
-      const g1 = clamp((p - 0.7) / 0.08), g2 = clamp((p - 0.8) / 0.12);
-      kiln.style.setProperty('--glow', (g1 * (1 - g2 * 0.7)).toFixed(3));
-      const sh = clamp((p - 0.74) / 0.14);
-      sheen.setAttribute('x', (-500 + sh * 1700).toFixed(1));
-      sheen.style.opacity = sh > 0 && sh < 1 ? 1 : 0;
-      // 6 · los canales llegan girando por la órbita
-      sats.forEach((s, i) => {
-        const t = clamp((p - 0.78 - i * 0.035) / 0.13);
-        const ang = (lerp(320, satTarget[i], eo(t))) * Math.PI / 180;
-        const sc = t <= 0 ? 0 : back(t);
-        s.setAttribute('transform', `translate(${(500 + Math.cos(ang) * 410).toFixed(1)} ${(500 + Math.sin(ang) * 410).toFixed(1)}) scale(${sc.toFixed(3)})`);
-        s.style.opacity = clamp(t * 3).toFixed(3);
-      });
-      ktext.style.opacity = clamp((p - 0.9) / 0.08).toFixed(3);
-      ktext.style.transform = `rotate(${(-time * 5).toFixed(2)}deg)`;
-      pulse.classList.toggle('is-on', p > 0.97);
+      ps = lerp(ps, target, .08);
+      lx = lerp(lx, lxT, .06);
+      // etapa: 0..5 (la 5 es horno/esmalte/sello sobre el jarrón)
+      const s = clamp(ps * 1.06, 0, 1) * 5;
+      const i0 = Math.min(4, Math.floor(s)), i1 = Math.min(4, i0 + 1);
+      const f0 = s - Math.floor(s);
+      const f = i0 === i1 ? 0 : (t => t * t * (3 - 2 * t))(clamp((f0 - .12) / .76));
+      const A = P[i0], B = P[i1];
+      const g = clamp(s - 4.05);            // horno + esmalte
+      const stamp = clamp((s - 4.55) / .3); // sello
+      const wheelA = 1 - clamp((s - 4) / .6);
+      const speed = (2.6 + boost * 6) * (1 - g * .985);
+      spin += dt * speed;
+      const cap = Math.min(5, Math.round(s - .2));
+      if (cap !== lastCap) { lastCap = cap; caps.forEach((c, k) => c.classList.toggle('is-on', k === cap)); steps.forEach((d, k) => d.classList.toggle('is-on', k <= cap)); }
+
+      const w = W, cx = w / 2, base = w * .74, h = lerp(A.h, B.h, f) * w * .95, o = lerp(A.o, B.o, f);
+      const R = k => lerp(A.r[k], B.r[k], f) * w * .92;
+      const rAt = u => { const x = clamp(u) * K, k = Math.floor(x), t = x - k; return k >= K ? R(K) : R(k) * (1 - t) + R(k + 1) * t; };
+      ctx.clearRect(0, 0, w, w);
+      ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+      const bodyCol = mix(RAW, CLAY, g * 0), top = mix(RAW, GLAZE, g);
+      // --- torno ilustrado (base, bandeja y plato) ---
+      const wa = wheelA;
+      if (wa > 0) {
+        ctx.save(); ctx.globalAlpha = wa; ctx.translate(0, (1 - wa) * w * .08);
+        // cuerpo del torno
+        ctx.fillStyle = '#C9A57A'; ctx.beginPath();
+        ctx.moveTo(cx - w * .36, base + w * .05); ctx.lineTo(cx + w * .36, base + w * .05);
+        ctx.quadraticCurveTo(cx + w * .38, base + w * .24, cx + w * .3, base + w * .25); ctx.lineTo(cx - w * .3, base + w * .25);
+        ctx.quadraticCurveTo(cx - w * .38, base + w * .24, cx - w * .36, base + w * .05); ctx.fill();
+        ctx.fillStyle = '#B48D62'; ctx.fillRect(cx - w * .36, base + w * .05, w * .72, w * .03);
+        ctx.fillStyle = 'rgba(255,240,215,.25)'; ctx.fillRect(cx - w * .3, base + w * .1, w * .04, w * .12);
+        ctx.fillStyle = '#C47A4E'; ctx.beginPath(); ctx.arc(cx + w * .22, base + w * .16, w * .026, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#9E5530'; ctx.beginPath(); ctx.arc(cx + w * .22, base + w * .16, w * .012, 0, Math.PI * 2); ctx.fill();
+        // bandeja terracota
+        ctx.fillStyle = '#A9502A'; ctx.beginPath(); ctx.ellipse(cx, base + w * .035, w * .41, w * .085, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#C4673B'; ctx.beginPath(); ctx.ellipse(cx, base + w * .02, w * .41, w * .08, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#8F4421'; ctx.beginPath(); ctx.ellipse(cx, base + w * .024, w * .36, w * .062, 0, 0, Math.PI * 2); ctx.fill();
+        // plato del torno (gira: marcas)
+        ctx.fillStyle = '#8D8A86'; ctx.beginPath(); ctx.ellipse(cx, base + w * .012, w * .3, w * .05, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#B5B1AB'; ctx.beginPath(); ctx.ellipse(cx, base, w * .3, w * .05, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,.35)'; ctx.lineWidth = w * .004;
+        for (let k = 0; k < 3; k++) { const a = spin * 1.6 + k * 2.1; if (Math.cos(a) > 0) { ctx.beginPath(); ctx.ellipse(cx, base, w * .3, w * .05, 0, a - .35 - Math.PI / 2, a + .35 - Math.PI / 2); ctx.stroke(); } }
+        ctx.restore();
+      }
+      // sombra al final (la pieza ya en la mesa)
+      if (g > 0) { ctx.fillStyle = `rgba(80,45,25,${.16 * g})`; ctx.beginPath(); ctx.ellipse(cx, base + w * .006, R(0) * 1.25, R(0) * .2, 0, 0, Math.PI * 2); ctx.fill(); }
+      // --- cuerpo de la pieza: silueta limpia con sombreado plano ---
+      const N = 48, side = (sx, k0 = 1) => { const pts = []; for (let k = 0; k <= N; k++) { const u = k / N; pts.push([cx + sx * rAt(u) * k0, base - u * h]); } return pts; };
+      const shape = (left, right) => { ctx.beginPath(); ctx.moveTo(left[0][0], left[0][1]); left.forEach(p => ctx.lineTo(p[0], p[1])); for (let k = right.length - 1; k >= 0; k--) ctx.lineTo(right[k][0], right[k][1]); ctx.closePath(); };
+      const L = side(-1), Rr = side(1);
+      // base color (con el baño de esmalte al final)
+      ctx.save(); shape(L, Rr); ctx.clip();
+      ctx.fillStyle = rgb(mix(RAW, CLAY, g)); ctx.fillRect(0, 0, w, w);
+      if (g > 0) { // esmalte crema "sumergido": arriba de una línea ondulada
+        ctx.fillStyle = rgb(GLAZE, 1, g); ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(w, 0);
+        for (let x = w; x >= 0; x -= w / 40) ctx.lineTo(x, base - h * .3 + Math.sin(x / w * 14 + 1) * w * .008 + Math.sin(x / w * 5) * w * .006);
+        ctx.closePath(); ctx.fill();
+      }
+      // sombra plana izquierda y luz derecha (siguen al cursor)
+      const shW = .3 - lx * .12, liP = .35 + lx * .25;
+      ctx.fillStyle = 'rgba(60,30,15,.2)'; shape(L, side(-1, 1 - shW * 2)); ctx.fill();
+      ctx.fillStyle = 'rgba(255,248,235,.28)'; shape(side(1, liP), side(1, liP + .14)); ctx.fill();
+      // anillos del torneado (arcos al frente)
+      if (g < 1) {
+        ctx.strokeStyle = `rgba(90,50,28,${.18 * (1 - g)})`; ctx.lineWidth = w * .0025;
+        const ring = (u) => { const r = rAt(u), y = base - u * h; ctx.beginPath(); ctx.ellipse(cx, y, r, r * .12, 0, .1, Math.PI - .1); ctx.stroke(); };
+        const off = (time * .35) % (1 / 7);
+        for (let u = off + .06; u < .97; u += 1 / 7) ring(u);
+      }
+      // marcas de dedos que giran (se ve la rotación)
+      if (g < .9) marks.forEach(m => { const a = m.a + spin, z = Math.cos(a); if (z < .2) return; const r = rAt(m.u);
+        ctx.fillStyle = m.d ? `rgba(90,50,28,${.25 * z * (1 - g)})` : `rgba(255,245,230,${.3 * z * (1 - g)})`;
+        ctx.beginPath(); ctx.ellipse(cx + Math.sin(a) * r * .97, base - m.u * h, w * .006 * m.s * z, w * .0018 * m.s, 0, 0, Math.PI * 2); ctx.fill(); });
+      // motas del esmalte
+      if (g > 0) specks.forEach(m => { const a = m.a + spin, z = Math.cos(a); if (z < .05) return; const r = rAt(m.u);
+        ctx.fillStyle = `rgba(74,40,22,${.8 * z * g})`; ctx.beginPath(); ctx.arc(cx + Math.sin(a) * r, base - m.u * h, w * .0028 * m.s * (.5 + z * .5), 0, Math.PI * 2); ctx.fill(); });
+      ctx.restore();
+      // contorno suave inferior (apoyo)
+      // --- boca ---
+      const rt = R(K), ty = base - h;
+      if (rt > 1) {
+        ctx.fillStyle = rgb(top, 1.06); ctx.beginPath(); ctx.ellipse(cx, ty, rt, rt * .24, 0, 0, Math.PI * 2); ctx.fill();
+        if (o > .02) { ctx.fillStyle = rgb(mix(RAW, CLAY, g), .62, o); ctx.beginPath(); ctx.ellipse(cx, ty + rt * .01, rt * .84 * o, rt * .19 * o + .5, 0, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = rgb(mix(RAW, CLAY, g), .48, o); ctx.beginPath(); ctx.ellipse(cx, ty + rt * .05, rt * .7 * o, rt * .12 * o + .5, 0, Math.PI, Math.PI * 2); ctx.fill(); }
+      }
+      // --- manos ilustradas que abrazan el barro ---
+      const handA = clamp(s / .5) * (1 - clamp((s - 4.05) / .35));
+      if (handA > 0) {
+        const press = Math.sin(time * 2.2) * w * .004;
+        const hu = [.45, .55, .45, .6, .55][Math.min(4, Math.round(s))] ?? .5;
+        const hy = base - lerp(.35, .62, clamp(s / 4)) * h;
+        const out = (1 - handA) * w * .25;
+        hand(cx - rAt((base - hy) / h) - w * .004 - out + press, hy, -1, handA);
+        hand(cx + rAt((base - hy) / h) + w * .004 + out - press, hy, 1, handA);
+      }
+      function hand(x, y, dir, al) {
+        const k = w / 1000; ctx.save(); ctx.globalAlpha = al; ctx.translate(x, y); ctx.scale(dir * k, k);
+        const skin = '#EDC3A0', skinS = '#D9A47F', clay = 'rgba(176,86,46,.55)';
+        // antebrazo
+        ctx.strokeStyle = skinS; ctx.lineWidth = 92; ctx.beginPath(); ctx.moveTo(150, 120); ctx.lineTo(300, 300); ctx.stroke();
+        ctx.strokeStyle = skin; ctx.lineWidth = 80; ctx.beginPath(); ctx.moveTo(150, 112); ctx.lineTo(300, 292); ctx.stroke();
+        // palma
+        ctx.fillStyle = skin; ctx.beginPath(); ctx.ellipse(118, 40, 78, 70, -.3, 0, Math.PI * 2); ctx.fill();
+        // dedos (curvados hacia la pieza)
+        const fingers = [[-62, 22], [-40, 20], [-12, 19], [16, 17]];
+        fingers.forEach(([fy, wd], i) => {
+          ctx.strokeStyle = skinS; ctx.lineWidth = wd + 6; ctx.beginPath(); ctx.moveTo(120, fy + 20); ctx.quadraticCurveTo(40, fy + 8, 8, fy + 22); ctx.stroke();
+          ctx.strokeStyle = skin; ctx.lineWidth = wd; ctx.beginPath(); ctx.moveTo(120, fy + 16); ctx.quadraticCurveTo(40, fy + 4, 8, fy + 18); ctx.stroke();
+          ctx.fillStyle = clay; ctx.beginPath(); ctx.arc(10, fy + 18, wd * .45, 0, Math.PI * 2); ctx.fill();
+        });
+        // pulgar por encima
+        ctx.strokeStyle = skinS; ctx.lineWidth = 30; ctx.beginPath(); ctx.moveTo(140, -10); ctx.quadraticCurveTo(100, -70, 50, -78); ctx.stroke();
+        ctx.strokeStyle = skin; ctx.lineWidth = 24; ctx.beginPath(); ctx.moveTo(140, -14); ctx.quadraticCurveTo(100, -72, 52, -80); ctx.stroke();
+        // brillo
+        ctx.fillStyle = 'rgba(255,255,255,.18)'; ctx.beginPath(); ctx.ellipse(130, 20, 30, 14, -.4, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+      }
+      // --- el sello de Terravita, estampado al final ---
+      if (stamp > 0 && markPaths.length) {
+        const sc = w * .085 / 1464 * (1 + (1 - stamp) * .9), u0 = .5;
+        const sx = cx - 732 * sc, sy = base - u0 * h - 868 * sc;
+        const m = markT.match(/translate\(([-\d.]+)[ ,]+([-\d.]+)\)\s*scale\(([-\d.]+)[ ,]+([-\d.]+)\)/);
+        const draw = (dx, dy, color) => { ctx.save(); ctx.translate(sx + dx, sy + dy); ctx.scale(sc, sc);
+          if (m) { ctx.translate(+m[1], +m[2]); ctx.scale(+m[3], +m[4]); }
+          ctx.fillStyle = color; markPaths.forEach(pp => ctx.fill(pp)); ctx.restore(); };
+        ctx.globalAlpha = stamp; draw(dpr * 1.5, dpr * 1.5, 'rgba(255,248,235,.8)'); draw(0, 0, rgb(CLAY, .92)); ctx.globalAlpha = 1;
+      }
     };
-    // Al pasar por un botón, su canal se enciende y una línea lo une
-    const rows = $$('.contact__row');
-    rows.forEach((row, i) => {
-      if (!sats[i]) return;
-      row.addEventListener('mouseenter', () => sats[i].classList.add('is-on'));
-      row.addEventListener('mouseleave', () => sats[i].classList.remove('is-on'));
-      row.addEventListener('focus', () => sats[i].classList.add('is-on'));
-      row.addEventListener('blur', () => sats[i].classList.remove('is-on'));
-      sats[i].addEventListener('click', () => row.click());
-    });
   }
 
   // ------------------------------------------------------------------
@@ -648,7 +724,7 @@
     const dt = Math.min(dms, 50) / 1000;
     wheelTick(dt);
     clayTick(dt);
-    kilnTick(dt);
+    pieceTick(dt);
     headerTick();
   });
 
