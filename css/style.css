@@ -689,18 +689,12 @@ em .ch, .ch.is-em { --s: 100; --k: 1; }
   .piece { width: min(100%, calc(var(--vh) - 395px)); max-width: 450px; }
   .piece__caps { margin-top: 6px; }
   .contact__list { gap: 8px; margin-top: 12px; }
-  .contact__row { grid-template-columns: 32px 1fr; column-gap: 9px; padding: 10px 11px; border: 0; border-radius: 16px; color: #fff; box-shadow: 0 8px 20px -12px rgba(43,26,17,.5); }
-  .contact__row::before { display: none; }
-  .contact__icon { width: 32px; height: 32px; border: 0; color: #fff; background: rgba(255,255,255,.18); }
+  .contact__row { grid-template-columns: 32px 1fr; column-gap: 9px; padding: 10px 11px; }
+  .contact__icon { width: 32px; height: 32px; }
   .contact__icon svg { width: 16px; height: 16px; }
-  .contact__label { font-size: 9.5px; opacity: .85; }
+  .contact__label { font-size: 9.5px; }
   .contact__val { font-size: 13.5px; }
-  .contact__row--wa { background: #25D366; }
-  .contact__row--tel { background: var(--clay); }
-  .contact__row--ig { background: linear-gradient(45deg, #F58529 0%, #DD2A7B 50%, #8134AF 80%, #515BD4 100%); }
-  .contact__row--tt { background: #000; }
-  .contact__row--tt .contact__icon svg { filter: drop-shadow(1.2px 1.2px 0 #FE2C55) drop-shadow(-1.2px -1.2px 0 #25F4EE); }
-  .contact__row:active { transform: scale(.97); filter: brightness(.95); background-color: inherit; color: #fff; }
+  .contact__row:active { transform: scale(.97); }
 }
 @media (max-width: 380px) {
   .contact__row { grid-template-columns: 28px 1fr; padding: 9px 8px; column-gap: 7px; }
@@ -709,4 +703,18 @@ em .ch, .ch.is-em { --s: 100; --k: 1; }
   .contact__val { font-size: 11.5px; letter-spacing: -.01em; }
   .contact__list { gap: 7px; }
   .piece { width: min(100%, calc(var(--vh) - 350px)); }
+}
+
+/* Íconos de contacto con los colores oficiales de cada canal (teléfono y computadora) */
+.contact__row--wa .contact__icon, .contact__row--tel .contact__icon, .contact__row--ig .contact__icon, .contact__row--tt .contact__icon { border: 0; color: #fff; }
+.contact__row--wa .contact__icon { background: #25D366; }
+.contact__row--tel .contact__icon { background: var(--clay); }
+.contact__row--ig .contact__icon { background: radial-gradient(circle at 30% 107%, #FDF497 0%, #FDF497 5%, #FD5949 45%, #D6249F 60%, #285AEB 90%); }
+.contact__row--tt .contact__icon { background: #000; }
+.contact__row--tt .contact__icon svg { filter: drop-shadow(1px 1px 0 #FE2C55) drop-shadow(-1px -1px 0 #25F4EE); }
+@media (hover: hover) {
+  .contact__row--wa:hover .contact__icon { background: #25D366; color: #fff; }
+  .contact__row--tel:hover .contact__icon { background: var(--cream); color: var(--clay); }
+  .contact__row--ig:hover .contact__icon { background: radial-gradient(circle at 30% 107%, #FDF497 0%, #FDF497 5%, #FD5949 45%, #D6249F 60%, #285AEB 90%); color: #fff; }
+  .contact__row--tt:hover .contact__icon { background: #000; color: #fff; }
 }
