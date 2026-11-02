@@ -564,16 +564,10 @@
     const rnd = (a => () => (a = (a * 16807) % 2147483647) / 2147483647)(7);
     const marks = Array.from({ length: 60 }, () => ({ a: rnd() * Math.PI * 2, u: .05 + rnd() * .9, s: .6 + rnd() * 1.4, d: rnd() > .5 }));
     const specks = Array.from({ length: 230 }, () => ({ a: rnd() * Math.PI * 2, u: .3 + rnd() * .7, s: .35 + rnd() * .9 }));
+    // Mano minimalista: una silueta (dedos juntos + pulgar) y una sombra suave
     const HAND = {
-      fore: new Path2D('M70 200 C 84 246, 94 280, 98 330 L 210 330 C 204 280, 190 240, 178 204 Z'),
-      foreShade: new Path2D('M150 206 L 178 204 C 190 240, 204 280, 210 330 L 184 330 C 180 286, 168 244, 150 206 Z'),
-      body: new Path2D('M 70 214 C 52 196, 34 172, 26 146 C 20 126, 18 108, 22 96 C 25 86, 36 86, 40 96 L 50 124 C 46 96, 40 66, 40 44 C 40 30, 56 28, 60 42 C 64 60, 68 86, 72 108 C 72 78, 74 46, 80 26 C 84 12, 100 14, 100 30 C 100 54, 98 82, 98 108 C 102 82, 108 56, 116 40 C 122 28, 138 32, 136 46 C 132 70, 126 94, 122 118 C 128 100, 136 84, 146 74 C 154 66, 166 74, 162 86 C 154 110, 146 136, 142 160 C 140 182, 166 196, 178 210 C 150 226, 100 230, 70 214 Z'),
-      shade: new Path2D('M 142 160 C 140 182, 166 196, 178 210 L 156 214 C 142 198, 132 180, 134 160 C 138 136, 148 108, 156 84 C 158 78, 162 80, 162 86 C 154 110, 146 136, 142 160 Z'),
-      lines: ['M 72 108 C 74 124, 76 136, 78 146', 'M 98 108 C 98 124, 98 136, 98 148', 'M 122 118 C 120 132, 118 142, 116 152', 'M 50 124 C 56 140, 62 150, 70 158'].map(d => new Path2D(d)),
-      knuckles: ['M 52 70 q 6 -2 10 0', 'M 82 52 q 7 -2 12 0', 'M 112 70 q 6 -1 11 2', 'M 144 94 q 5 0 9 3'].map(d => new Path2D(d)),
-      nails: [[50, 36, 7, 9, -8], [90, 22, 7, 9, 0], [127, 40, 6.5, 8.5, 12], [155, 74, 5.5, 7, 24], [29, 94, 5, 6, -30]],
-      clay: ['M 37 44 a 7 7 0 1 0 14 0 a 7 7 0 1 0 -14 0', 'M 78 30 a 6 6 0 1 0 12 0 a 6 6 0 1 0 -12 0', 'M 18 108 a 6 6 0 1 0 12 0 a 6 6 0 1 0 -12 0', 'M 30 150 c 6 10 14 22 26 34 l -8 6 c -10 -10 -18 -22 -22 -32 z'].map(d => new Path2D(d)),
-      shine: new Path2D('M 64 170 C 74 176, 96 178, 112 172'),
+      body: new Path2D('M60 150 C 50 110, 48 70, 58 40 C 66 18, 98 10, 116 22 C 132 32, 136 60, 132 96 C 140 84, 152 80, 160 88 C 168 96, 160 116, 148 136 C 140 150, 136 166, 136 184 C 138 230, 150 270, 160 340 L 84 340 C 80 270, 72 200, 60 150 Z'),
+      shade: new Path2D('M132 96 C 128 120, 120 140, 118 160 C 116 180, 120 200, 124 230 C 120 196, 120 170, 124 150 C 126 136, 130 116, 132 96 Z'),
     };
     const markPaths = $$('#mark path').map(p => new Path2D(p.getAttribute('d')));
     const markT = $('#mark g')?.getAttribute('transform') || '';
@@ -690,22 +684,15 @@
         // las manos abrazan la parte más ancha de la pieza
         let bu = .4, br = 0; for (let u = .18; u <= .72; u += .02) { const r = rAt(u); if (r > br) { br = r; bu = u; } }
         const hy = base - bu * h;
-        const out = (1 - handA) * w * .25, grip = w * .018;
+        const out = (1 - handA) * w * .25, grip = w * .012;
         hand(cx - br + grip - out + press, hy, -1, handA);
         hand(cx + br - grip + out - press, hy, 1, handA);
       }
       function hand(x, y, dir, al) {
-        // Mano ilustrada (vector propio). Punto de contacto con el barro: (24, 130)
-        const k = w / 1000 * 1.12; ctx.save(); ctx.globalAlpha = al; ctx.translate(x, y); ctx.scale(dir * k, k); ctx.rotate(-.32); ctx.translate(-24, -130);
-        ctx.fillStyle = '#EDBF9B'; ctx.fill(HAND.fore);
-        ctx.fillStyle = '#DDA27C'; ctx.fill(HAND.foreShade);
-        ctx.fillStyle = '#F1C6A2'; ctx.fill(HAND.body);
-        ctx.fillStyle = '#DDA27C'; ctx.fill(HAND.shade);
-        ctx.lineCap = 'round'; ctx.strokeStyle = '#D69A74'; ctx.lineWidth = 3.2; HAND.lines.forEach(l => ctx.stroke(l));
-        ctx.strokeStyle = '#E2AE8A'; ctx.lineWidth = 2; HAND.knuckles.forEach(l => ctx.stroke(l));
-        ctx.fillStyle = '#F8DCC7'; HAND.nails.forEach(([nx, ny, rx, ry, rt]) => { ctx.beginPath(); ctx.ellipse(nx, ny, rx, ry, rt * Math.PI / 180, 0, Math.PI * 2); ctx.fill(); });
-        ctx.fillStyle = 'rgba(176,86,46,.55)'; HAND.clay.forEach(c => ctx.fill(c));
-        ctx.strokeStyle = 'rgba(248,217,191,.8)'; ctx.lineWidth = 5; ctx.stroke(HAND.shine);
+        // Punto de contacto con el barro: borde izquierdo de los dedos (52, 96)
+        const k = w / 1000 * 1.05; ctx.save(); ctx.globalAlpha = al; ctx.translate(x, y); ctx.scale(dir * k, k); ctx.rotate(-.28); ctx.translate(-52, -96);
+        ctx.fillStyle = '#EDBE9A'; ctx.fill(HAND.body);
+        ctx.fillStyle = 'rgba(214,150,112,.55)'; ctx.fill(HAND.shade);
         ctx.restore();
       }
       // --- el sello de Terravita, estampado al final ---
