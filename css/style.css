@@ -57,7 +57,7 @@ em { font-style: italic; }
 /* --------------------------------------------------------------------------
    Tipografía
    -------------------------------------------------------------------------- */
-.display, .hero__title, .contact__title, .manifesto__text, .event__name, .ribbon, .footer__slogan, .card h3, .steps h3, .product__info h3, .menu__nav a {
+.display, .hero__title, .contact__title, .manifesto__text, .event__name, .footer__slogan, .card h3, .steps h3, .product__info h3, .menu__nav a {
   font-family: var(--f-display);
   font-weight: 400;
   font-variation-settings: "opsz" 144, "SOFT" 30, "WONK" 0;
@@ -303,15 +303,6 @@ em .ch, .ch.is-em { --s: 100; --k: 1; }
 }
 
 /* --------------------------------------------------------------------------
-   Cinta del proceso
-   -------------------------------------------------------------------------- */
-.ribbon { background: var(--clay) var(--speckle); background-size: 420px 420px; color: var(--cream); overflow: hidden; padding: clamp(26px, 4vw, 48px) 0; }
-.ribbon__row { display: flex; width: max-content; will-change: transform; }
-.ribbon__item { display: flex; align-items: center; gap: .45em; padding-right: .45em; font-size: clamp(3rem, 9vw, 9rem); line-height: 1; white-space: nowrap; }
-.ribbon__item em { font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1; }
-.ribbon__item svg { width: .48em; height: .57em; fill: var(--cream); flex: 0 0 auto; }
-
-/* --------------------------------------------------------------------------
    Eventos
    -------------------------------------------------------------------------- */
 .eventos { position: relative; background: var(--ink); color: var(--cream); padding: clamp(90px, 14vw, 180px) 0; overflow: hidden; }
@@ -332,7 +323,7 @@ em .ch, .ch.is-em { --s: 100; --k: 1; }
   .event a:hover .event__go { transform: translateX(-8px) rotate(-45deg); }
   .event a:hover .event__desc { color: var(--cream); }
 }
-.eventos__float { position: fixed; left: 0; top: 0; z-index: 50; width: clamp(220px, 20vw, 320px); aspect-ratio: 4 / 5; pointer-events: none; border-radius: 18px; overflow: hidden; opacity: 0; transform: translate(-50%, -50%) scale(.6); }
+.eventos__float { position: fixed; left: 0; top: 0; z-index: 50; width: clamp(220px, 20vw, 320px); aspect-ratio: 4 / 5; pointer-events: none; border-radius: 18px; overflow: hidden; opacity: 0; visibility: hidden; transform: scale(.7); }
 .eventos__float .ph { width: 100%; height: 100%; }
 
 /* --------------------------------------------------------------------------
@@ -393,34 +384,42 @@ em .ch, .ch.is-em { --s: 100; --k: 1; }
 .chan__val { font-size: 1.15rem; font-weight: 450; }
 
 /* --------------------------------------------------------------------------
-   Footer: el fondo moteado del logo
+   Footer: el fondo moteado del logo. Compacto, mismas proporciones que Caraqueña
    -------------------------------------------------------------------------- */
-.footer { position: relative; background: var(--clay) var(--speckle); background-size: 460px 460px; color: var(--cream); padding-top: clamp(70px, 9vw, 120px); overflow: hidden; }
-.footer__top { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px; }
-.footer__slogan { font-size: clamp(1.8rem, 3vw, 3rem); line-height: 1.05; max-width: 12em; }
+.footer { position: relative; background: var(--clay) var(--speckle); background-size: 460px 460px; color: var(--cream); padding: 80px 0 28px; overflow: hidden; }
+.footer__top { display: flex; justify-content: space-between; align-items: flex-end; gap: 32px; flex-wrap: wrap; }
+.footer__contact { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.footer__label { color: rgba(255,245,222,.7); margin-bottom: 4px; }
+.footer__big { font-family: var(--f-display); font-variation-settings: "opsz" 144, "SOFT" 60; font-size: clamp(20px, 2.4vw, 32px); line-height: 1.2; transition: opacity .3s; }
+.footer__nav { display: flex; gap: 10px 22px; flex-wrap: wrap; font-size: 12px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; }
+.footer__nav a, .footer__bottom a { opacity: .85; transition: opacity .3s; }
+@media (hover: hover) { .footer__big:hover { opacity: .7; } .footer__nav a:hover, .footer__bottom a:hover { opacity: 1; } }
+.footer__logo { display: flex; align-items: center; justify-content: center; gap: 2vw; margin: 60px 0 30px; padding: 0 var(--gutter); }
+.footer__mark { width: 6.7vw; height: 7.9vw; flex: none; fill: var(--cream); }
+.footer__lock { display: flex; flex-direction: column; }
+.footer__word { width: 10.9vw; height: 7.9vw; fill: var(--cream); }
+.footer__slogan { font-size: 2.05vw; line-height: 1.05; max-width: 9.5em; margin-left: 1vw; padding-left: 2vw; border-left: 1px solid rgba(255,245,222,.3); }
 .footer__slogan em { color: var(--cream); }
-.footer__col { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
-.footer__col a { opacity: .88; position: relative; }
-.footer__col a:hover { opacity: 1; }
-.footer__label { color: rgba(255,245,222,.6); margin-bottom: 8px; }
-.footer__logo { display: flex; align-items: flex-end; justify-content: center; gap: 3vw; padding: clamp(60px, 9vw, 120px) var(--gutter) clamp(26px, 3vw, 40px); }
-.footer__mark { width: 25vw; max-width: 380px; aspect-ratio: 1464 / 1736; height: auto; fill: var(--cream); }
-.footer__word { width: 36vw; max-width: 540px; aspect-ratio: 1585 / 1150; height: auto; fill: var(--cream); }
-.footer__bottom { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; padding-top: 22px; padding-bottom: calc(26px + env(safe-area-inset-bottom)); border-top: 1px solid rgba(255,245,222,.25); font-size: .88rem; color: rgba(255,245,222,.75); }
+.footer__bottom { display: flex; justify-content: space-between; gap: 12px 24px; flex-wrap: wrap; padding-top: 20px; border-top: 1px solid rgba(255,245,222,.25); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,245,222,.75); }
 
 /* --------------------------------------------------------------------------
-   Botón flotante de WhatsApp
+   Botones flotantes permanentes (Instagram + WhatsApp)
    -------------------------------------------------------------------------- */
+.fabs {
+  position: fixed; z-index: 58; right: calc(16px + env(safe-area-inset-right)); bottom: calc(16px + env(safe-area-inset-bottom));
+  display: flex; flex-direction: column; gap: 12px;
+}
 .fab {
-  position: fixed; z-index: 58; right: calc(18px + env(safe-area-inset-right)); bottom: calc(18px + env(safe-area-inset-bottom));
-  width: 60px; height: 60px; border-radius: 50%; display: grid; place-items: center;
+  position: relative; width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center;
   background: var(--clay); color: var(--cream); box-shadow: 0 0 0 2px rgba(255,245,222,.85), 0 14px 34px -10px rgba(107,43,16,.6);
   transform: scale(0); transition: transform .6s var(--ease), background-color .4s;
+  -webkit-tap-highlight-color: transparent;
 }
-.fab.is-in { transform: scale(1); }
-.fab:hover { transform: scale(1.08); background: var(--ink); }
-.fab svg { width: 28px; height: 28px; fill: currentColor; }
-.fab::after { content: ""; position: absolute; inset: 0; border-radius: 50%; border: 1.5px solid var(--clay); animation: ring 2.6s var(--ease) infinite; }
+.fab--ig { transition-delay: .08s; }
+.fabs.is-in .fab { transform: scale(1); }
+@media (hover: hover) { .fabs.is-in .fab:hover { transform: scale(1.08); background: var(--ink); } }
+.fab svg { width: 26px; height: 26px; fill: currentColor; }
+.fab--wa::after { content: ""; position: absolute; inset: 0; border-radius: 50%; border: 1.5px solid var(--clay); animation: ring 2.6s var(--ease) infinite; pointer-events: none; }
 @keyframes ring { from { transform: scale(1); opacity: .7; } to { transform: scale(1.7); opacity: 0; } }
 
 /* --------------------------------------------------------------------------
@@ -456,22 +455,71 @@ em .ch, .ch.is-em { --s: 100; --k: 1; }
   .product__info h3 { font-size: 1.3rem; }
   .product__media::after { display: none; }
 
-  .footer__top { grid-template-columns: 1fr 1fr; }
-  .footer__top .footer__col:first-child { grid-column: 1 / -1; }
-  .footer__logo { gap: 5vw; }
-  .footer__mark { width: 30vw; }
-  .footer__word { width: 46vw; }
+  .footer { padding-top: 64px; }
+  .footer__logo { flex-wrap: wrap; gap: 3vw; margin: 48px 0 26px; }
+  .footer__mark { width: 9.7vw; height: 11.5vw; }
+  .footer__word { width: 15.9vw; height: 11.5vw; }
+  .footer__slogan { font-size: 3.4vw; }
+  .footer__bottom { padding-right: 70px; }
 }
 @media (max-width: 520px) {
   .contact__grid { grid-template-columns: 1fr 1fr; gap: 10px; }
   .chan { min-height: 160px; padding: 20px 18px 22px; }
   .chan__val { font-size: .95rem; word-break: break-word; }
-  .fab { width: 54px; height: 54px; }
+  .fab { width: 50px; height: 50px; }
+  .fab svg { width: 24px; height: 24px; }
+  .fabs { gap: 10px; }
 }
 @media (max-height: 620px) and (max-width: 899px) {
   .hero__actions { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .grain, .dot, .fab::after, .encargos__badge > svg:first-child, .hero__scroll i { animation: none; }
+  .grain, .dot, .fab--wa::after, .encargos__badge > svg:first-child, .hero__scroll i { animation: none; }
+}
+
+/* Teléfono en horizontal: titular a la izquierda, torno a la derecha */
+@media (max-width: 999px) and (max-height: 520px) and (orientation: landscape) {
+  .hero__copy { top: 0; bottom: 0; justify-content: center; right: auto; width: 56vw; padding-top: 48px; }
+  .hero__title { font-size: clamp(2rem, 6.4vw, 3.4rem); }
+  .hero__eyebrow { margin-bottom: 12px; }
+  .hero__actions { display: flex; margin-top: 16px; }
+  .hero__actions .btn { height: 42px; padding: 0 18px; }
+  .wheel { left: auto; right: calc(var(--gutter) + 4vw); top: 50%; bottom: auto; width: min(32vw, 58vh); transform: translateY(-42%); }
+  .manifesto__text { font-size: clamp(1.4rem, 3.6vw, 2.2rem); }
+  .menu { padding-top: 76px; }
+  .menu__nav a { font-size: clamp(1.8rem, 7vh, 2.6rem); }
+  .card { width: min(46vw, 340px); }
+  .card__media { aspect-ratio: 16 / 10; }
+}
+
+/* Tableta vertical: más aire y tarjetas a dos columnas */
+@media (min-width: 600px) and (max-width: 899px) {
+  .hero__title { font-size: clamp(3.4rem, 10vw, 5.6rem); }
+  .wheel { width: min(52vw, 40vh); }
+  .card { width: min(44vw, 380px); }
+  .contact__grid { grid-template-columns: repeat(2, 1fr); }
+  .encargos__media { margin: 0 auto; width: 80%; }
+}
+
+/* Pantallas muy chicas (iPhone SE, Android de 360px) */
+@media (max-width: 380px) {
+  .header__word { width: 52px; }
+  .header__cta { padding: 0 14px; font-size: .82rem; }
+  .hero__title { font-size: 11.6vw; }
+  .chan__val { font-size: .86rem; }
+}
+
+/* Ajustes finos por dispositivo */
+.footer__bottom { padding-right: 84px; }
+@media (max-width: 420px) {
+  .contact__grid { grid-template-columns: 1fr; }
+  .chan { min-height: 0; display: grid; grid-template-columns: 40px 1fr; grid-template-areas: "i l" "i v"; align-items: center; column-gap: 14px; row-gap: 2px; padding: 18px 20px; }
+  .chan svg { grid-area: i; margin: 0; width: 30px; height: 30px; }
+  .chan__label { grid-area: l; margin: 0; }
+  .chan__val { grid-area: v; font-size: 1rem; }
+}
+@media (max-width: 999px) and (max-height: 520px) and (orientation: landscape) {
+  .hero__eyebrow { display: none; }
+  .hero__copy { padding-top: 64px; }
 }

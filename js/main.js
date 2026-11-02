@@ -45,10 +45,11 @@
   if (!window.gsap || !window.ScrollTrigger) {
     document.body.classList.remove('is-loading');
     $('#loader')?.remove();
-    $('.fab')?.classList.add('is-in');
+    $('.fabs')?.classList.add('is-in');
     return;
   }
   gsap.registerPlugin(ScrollTrigger);
+  ScrollTrigger.config({ ignoreMobileResize: true }); // la barra de Safari al aparecer no reacomoda todo
 
   // ------------------------------------------------------------------
   // Scroll suave
@@ -320,43 +321,43 @@
   });
 
   // ------------------------------------------------------------------
-  // Cinta del proceso: corre sola y responde al scroll
-  // ------------------------------------------------------------------
-  const marquee = $('.js-marquee');
-  const mItem = $('.ribbon__item', marquee);
-  for (let i = 0; i < 3; i++) marquee.appendChild(mItem.cloneNode(true)).setAttribute('aria-hidden', 'true');
-  let mx = 0, mDir = 1;
-  function marqueeTick(dt) {
-    if (reduce) return;
-    const v = velocity();
-    if (v > 0.5) mDir = 1; else if (v < -0.5) mDir = -1;
-    mx -= dt * (70 + Math.abs(v) * 40) * mDir;
-    const w = mItem.offsetWidth;
-    if (w) { mx %= w; if (mx > 0) mx -= w; }
-    marquee.style.transform = `translate3d(${mx.toFixed(1)}px,0,0)`;
-  }
-
-  // ------------------------------------------------------------------
   // Eventos: foto flotante que sigue el cursor
   // ------------------------------------------------------------------
-  if (fine) {
+  if (fine && innerWidth >= 900) {
     const float = $('.eventos__float');
     const tag = $('#floatTag');
     const fx = gsap.quickTo(float, 'x', { duration: 0.6, ease: 'power3.out' });
     const fy = gsap.quickTo(float, 'y', { duration: 0.6, ease: 'power3.out' });
     const fr = gsap.quickTo(float, 'rotation', { duration: 0.8, ease: 'power3.out' });
-    let px = 0;
-    gsap.set(float, { xPercent: -50, yPercent: -50 });
+    let px = 0, shown = false;
+    // La foto va al lado del cursor y nunca se sale de la pantalla (antes, en "Eventos privados" quedaba cortada abajo)
+    const place = (cx, cy, instant) => {
+      const w = float.offsetWidth, h = float.offsetHeight, m = 20;
+      const x = clamp(cx + 40, m, innerWidth - w - m - 70);
+      const y = clamp(cy - h / 2, 90, innerHeight - h - m);
+      if (instant) { gsap.set(float, { x, y }); fx.tween?.kill(); fy.tween?.kill(); fx(x); fy(y); }
+      else { fx(x); fy(y); }
+    };
+    const hide = () => { if (!shown) return; shown = false; gsap.to(float, { autoAlpha: 0, scale: 0.7, duration: 0.35, ease: 'power3.in', overwrite: 'auto' }); };
     $$('.event').forEach(ev => {
-      ev.addEventListener('mouseenter', () => {
+      ev.addEventListener('mouseenter', e => {
         tag.textContent = `Foto · ${ev.dataset.img}`;
-        gsap.to(float, { autoAlpha: 1, scale: 1, duration: 0.5, ease: 'expo.out' });
+        if (!shown) place(e.clientX, e.clientY, true);
+        shown = true;
+        gsap.to(float, { autoAlpha: 1, scale: 1, duration: 0.5, ease: 'expo.out', overwrite: 'auto' });
       });
-      ev.addEventListener('mouseleave', () => gsap.to(float, { autoAlpha: 0, scale: 0.6, duration: 0.4, ease: 'power3.in' }));
     });
+    $('.events').addEventListener('mouseleave', hide);
     $('.events').addEventListener('mousemove', e => {
-      fx(e.clientX); fy(e.clientY); fr(clamp((e.clientX - px) * 0.6, -14, 14)); px = e.clientX;
+      place(e.clientX, e.clientY);
+      fr(clamp((e.clientX - px) * 0.4, -8, 8)); px = e.clientX;
     });
+    // Si la página se mueve con la rueda y el cursor queda fuera de la lista, se esconde
+    addEventListener('scroll', () => {
+      if (!shown) return;
+      const r = $('.events').getBoundingClientRect();
+      if (pointer.y < r.top || pointer.y > r.bottom) hide();
+    }, { passive: true });
   }
 
   // ------------------------------------------------------------------
@@ -377,7 +378,7 @@
       });
     });
 
-    const groups = ['.lead', '.tag', '.steps li', '.product', '.chan', '.footer__col', '.shop__cta', '.encargos__copy > .btn', '.event'];
+    const groups = ['.lead', '.tag', '.steps li', '.product', '.chan', '.footer__contact', '.footer__nav', '.shop__cta', '.encargos__copy > .btn', '.event'];
     if (!matchMedia('(min-width: 900px) and (hover: hover)').matches) groups.push('.card');
     const els = $$(groups.join(',')).filter(el => !el.closest('.hero'));
     gsap.set(els, { y: 40, opacity: 0 });
@@ -397,9 +398,9 @@
     // Terrashop: la hoja crema sube sobre la página
     gsap.from('.shop', { borderRadius: '120px 120px 0 0', ease: 'none', scrollTrigger: { trigger: '.shop', start: 'top bottom', end: 'top 30%', scrub: true } });
 
-    // Footer: el logo emerge del barro
-    gsap.fromTo('.footer__mark', { yPercent: 45, rotation: -14 }, { yPercent: 0, rotation: 0, ease: 'none', scrollTrigger: { trigger: '.footer', start: 'top bottom', end: 'bottom bottom', scrub: true } });
-    gsap.fromTo('.footer__word', { yPercent: 60 }, { yPercent: 0, ease: 'none', scrollTrigger: { trigger: '.footer', start: 'top bottom', end: 'bottom bottom', scrub: true } });
+    // Footer: la vasija gira hasta su sitio y la marca sube
+    gsap.fromTo('.footer__mark', { rotation: -24, yPercent: 30 }, { rotation: 0, yPercent: 0, ease: 'none', scrollTrigger: { trigger: '.footer', start: 'top bottom', end: 'bottom bottom', scrub: true } });
+    gsap.fromTo('.footer__lock, .footer__slogan', { yPercent: 30, opacity: 0 }, { yPercent: 0, opacity: 1, ease: 'none', stagger: 0.1, scrollTrigger: { trigger: '.footer', start: 'top bottom', end: 'bottom bottom', scrub: true } });
   }
 
   // ------------------------------------------------------------------
@@ -453,7 +454,7 @@
         loader.remove();
         document.body.classList.remove('is-loading');
         lenis?.start();
-        $('.fab').classList.add('is-in');
+        $('.fabs').classList.add('is-in');
         // La ola de bienvenida en el título
         const g = clayGroups.find(g => g.el.classList.contains('hero__title'));
         const o = { v: -0.3 };
@@ -467,7 +468,6 @@
   gsap.ticker.add((t, dms) => {
     const dt = Math.min(dms, 50) / 1000;
     wheelTick(dt);
-    marqueeTick(dt);
     clayTick(dt);
     headerTick();
   });
