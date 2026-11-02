@@ -718,3 +718,15 @@ em .ch, .ch.is-em { --s: 100; --k: 1; }
   .contact__row--ig:hover .contact__icon { background: radial-gradient(circle at 30% 107%, #FDF497 0%, #FDF497 5%, #FD5949 45%, #D6249F 60%, #285AEB 90%); color: #fff; }
   .contact__row--tt:hover .contact__icon { background: #000; color: #fff; }
 }
+
+/* Footer: secciones arriba a la izquierda, números a la derecha */
+.footer__top { align-items: flex-start; }
+.footer__contact { align-items: flex-end; text-align: right; }
+.footer__contact .footer__big { flex-direction: row; }
+@media (max-width: 899px) {
+  .footer__top { flex-direction: column; gap: 22px; }
+  .footer__contact { align-items: flex-start; text-align: left; }
+}
+.footer__big { position: relative; }
+.footer__contact .footer__big i { position: absolute; right: -1.1em; top: .2em; }
+@media (min-width: 900px) { .footer__contact { padding-right: 0; } }
