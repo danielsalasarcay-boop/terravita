@@ -66,6 +66,7 @@ function init() {
   scene.add(key, key.target);
   key.target.position.set(0, Y0 + .1, 0);
   scene.add(new THREE.HemisphereLight(0xfff4e4, 0x7a5236, .35));
+  const rim = new THREE.DirectionalLight(0xfff3e6, .9); rim.position.set(-.9, .8, -1.3); scene.add(rim); // contraluz que despega la pieza del fondo
 
   // ---------- texturas hechas por código ----------
   const canvasTex = (w, h, draw, srgb = true) => {
@@ -104,6 +105,28 @@ function init() {
     x.filter = 'blur(.6px)'; x.drawImage(x.canvas, 0, 0);
   }, false);
   grain.repeat.set(10, 5);
+  // Nubes de baja frecuencia: zonas más húmedas / más secas, grosor del esmalte
+  const cloud = canvasTex(512, 512, (x, w, h) => {
+    x.fillStyle = '#c8c8c8'; x.fillRect(0, 0, w, h);
+    for (let i = 0; i < 420; i++) {
+      const cx = rnd() * w, cy = rnd() * h, r = 12 + rnd() * 70, v = rnd() > .5 ? 255 : 0;
+      for (const ox of [-w, 0, w]) for (const oy of [-h, 0, h]) {
+        const g = x.createRadialGradient(cx + ox, cy + oy, 0, cx + ox, cy + oy, r);
+        g.addColorStop(0, `rgba(${v},${v},${v},.09)`); g.addColorStop(1, `rgba(${v},${v},${v},0)`);
+        x.fillStyle = g; x.fillRect(cx + ox - r, cy + oy - r, r * 2, r * 2);
+      }
+    }
+  }, false);
+  cloud.repeat.set(3, 2);
+  // Cuerpo del torno: pintura con manchas de barbotina seca y huellas
+  const bodyMap = canvasTex(512, 512, (x, w, h) => {
+    x.fillStyle = '#ffffff'; x.fillRect(0, 0, w, h);
+    for (let i = 0; i < 120; i++) { const cx = rnd() * w, cy = rnd() * h, r = 2 + Math.pow(rnd(), 2) * 22;
+      const g = x.createRadialGradient(cx, cy, 0, cx, cy, r); g.addColorStop(0, `rgba(150,128,108,${.15 + rnd() * .25})`); g.addColorStop(1, 'rgba(150,128,108,0)');
+      x.fillStyle = g; x.fillRect(cx - r, cy - r, r * 2, r * 2); }
+    for (let i = 0; i < 25; i++) { x.strokeStyle = `rgba(140,120,100,${.04 + rnd() * .07})`; x.lineWidth = 2 + rnd() * 6; const x0 = rnd() * w, y0 = rnd() * h * .4;
+      x.beginPath(); x.moveTo(x0, y0); x.lineTo(x0 + (rnd() - .5) * 8, y0 + 20 + rnd() * 120); x.stroke(); } // chorreados
+  });
   // Motas del esmalte (óxido de hierro que sale a través del esmalte crema)
   const speck = canvasTex(512, 512, (x, w, h) => {
     x.fillStyle = '#000'; x.fillRect(0, 0, w, h);
@@ -151,7 +174,7 @@ function init() {
   });
   // Madera de la repisa
   const woodMap = canvasTex(1024, 256, (x, w, h) => {
-    x.fillStyle = '#b98a5c'; x.fillRect(0, 0, w, h);
+    x.fillStyle = '#c9a479'; x.fillRect(0, 0, w, h);
     for (let i = 0; i < 160; i++) {
       const y0 = rnd() * h, a = 2 + rnd() * 6, f = .004 + rnd() * .01, ph = rnd() * TAU;
       x.strokeStyle = `rgba(${rnd() > .5 ? '120,78,44' : '214,170,120'},${.08 + rnd() * .22})`; x.lineWidth = .6 + rnd() * 2.6;
@@ -263,11 +286,11 @@ function init() {
 
   const U = {
     uGlaze: { value: 0 }, uDip: { value: .2 }, uGlow: { value: 0 }, uStamp: { value: 0 }, uStampS: { value: 1 },
-    uStampY: { value: .2 }, uStampW: { value: .085 }, uSpeck: { value: speck }, uStampT: { value: stampTex },
-    uGlazeCol: { value: new THREE.Color(0xf1e7d4) }, uSpeckCol: { value: new THREE.Color(0x4a2a17) }, uSealCol: { value: new THREE.Color(0x6e3d22) }, uBreakCol: { value: new THREE.Color(0xb88452) }, uTop: { value: .5 },
+    uStampY: { value: .2 }, uStampW: { value: .085 }, uSpeck: { value: speck }, uCloud: { value: cloud }, uStampT: { value: stampTex },
+    uGlazeCol: { value: new THREE.Color(0xf1e7d4) }, uSpeckCol: { value: new THREE.Color(0x4a2a17) }, uSealCol: { value: new THREE.Color(0x8a5a36) }, uBreakCol: { value: new THREE.Color(0xb88452) }, uTop: { value: .5 },
   };
   const WET = new THREE.Color(0x7f6b5c), BISQUE = new THREE.Color(0xd9c4a4);
-  const clayMat = new THREE.MeshStandardMaterial({ color: WET.clone(), map: clayMap, bumpMap: grain, bumpScale: .9, roughness: .34, metalness: 0, envMapIntensity: 1.05 });
+  const clayMat = new THREE.MeshStandardMaterial({ color: WET.clone(), map: clayMap, bumpMap: grain, bumpScale: .9, roughnessMap: cloud, roughness: .34, metalness: 0, envMapIntensity: 1.05 });
   clayMat.onBeforeCompile = sh => {
     Object.assign(sh.uniforms, U);
     sh.vertexShader = sh.vertexShader
@@ -277,7 +300,7 @@ function init() {
       .replace('#include <common>', `#include <common>
         varying vec3 vObj; varying float vInner;
         uniform float uGlaze, uDip, uGlow, uStamp, uStampS, uStampY, uStampW;
-        uniform sampler2D uSpeck, uStampT; uniform vec3 uGlazeCol, uSpeckCol, uSealCol, uBreakCol; uniform float uTop;
+        uniform sampler2D uSpeck, uStampT, uCloud; uniform vec3 uGlazeCol, uSpeckCol, uSealCol, uBreakCol; uniform float uTop;
         float gMask; float sealA;
         // relieve del sello (0..1), hundido en la pared exterior
         float stampH() {
@@ -293,13 +316,24 @@ function init() {
           float rr = length(vObj.xz);
           // esmalte: la pieza se "sumerge" boca abajo; el borde del baño ondula y el interior queda esmaltado
           float dip = uDip + 0.0065 * sin(ang * 5.0 + 1.0) + 0.004 * sin(ang * 11.0 + 2.3) + 0.0025 * sin(ang * 23.0);
+          // chorreados del esmalte por debajo del borde del baño
+          for (int i = 0; i < 9; i++) {
+            float fi = float(i);
+            float a0 = fract(sin(fi * 12.9898) * 43758.5453) * 6.2832 - 3.1416;
+            float wd = 0.035 + 0.03 * fract(sin(fi * 78.233) * 9631.7);
+            float ln = 0.012 + 0.03 * fract(sin(fi * 39.425) * 2715.3);
+            float d = mod(ang - a0 + 3.1416, 6.2832) - 3.1416;
+            dip -= ln * exp(-d * d / (wd * wd)) * smoothstep(0.0, 0.5, uGlaze);
+          }
           float outer = smoothstep(dip - 0.0025, dip + 0.0025, vObj.y);
           gMask = uGlaze * max(outer, step(0.5, vInner));
           float edge = (1.0 - smoothstep(dip, dip + 0.014, vObj.y)) * outer;
           vec2 sUv = vec2(ang * 0.32 * (0.6 + rr * 1.4), vObj.y * 1.15) * 2.2;
           float sp = texture2D(uSpeck, sUv).r;
           float sp2 = texture2D(uSpeck, sUv * 2.7 + 0.31).r;
-          vec3 glaze = uGlazeCol * (1.0 - edge * 0.07);
+          float thick = clamp((texture2D(uCloud, vec2(ang * 0.5, vObj.y * 1.6)).r - 0.6) * 2.5 + 0.5, 0.0, 1.0);
+          vec3 glaze = uGlazeCol * (1.0 - edge * 0.07) * (0.96 + thick * 0.08);
+          glaze = mix(glaze, glaze * vec3(1.0, 0.95, 0.86), smoothstep(0.55, 0.75, thick) * 0.6);
           glaze = mix(glaze, uSpeckCol, clamp(sp * 0.9 + sp2 * 0.35, 0.0, 1.0));
           // el esmalte se adelgaza y "quiebra" a ámbar en las crestas del torneado y en el labio
           float y = vObj.y;
@@ -317,14 +351,14 @@ function init() {
               float a2 = texture2D(uStampT, st + vec2(-0.012, -0.012)).a;
               sealA = a * uStamp;
               vec3 seal = uSealCol;
-              diffuseColor.rgb = mix(diffuseColor.rgb, seal, sealA * 0.82);
+              diffuseColor.rgb = mix(diffuseColor.rgb, seal, sealA * 0.7);
             }
           }
         }`)
       .replace('#include <normal_fragment_maps>', `#include <normal_fragment_maps>
         { float hS = stampH(); if (uStamp > 0.0) normal = perturbNormalArb(-vViewPosition, normal, vec2(dFdx(hS), dFdy(hS)) * -2.2, faceDirection); }`)
       .replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>
-        roughnessFactor = mix(roughnessFactor, 0.15, gMask);`)
+        roughnessFactor = mix(roughnessFactor, 0.1 + 0.25 * (texelRoughness.g - 0.6), gMask);`)
       .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
         totalEmissiveRadiance += uGlow * vec3(1.0, 0.36, 0.09) * (0.75 + 0.25 * sin(vObj.y * 40.0 + atan(vObj.x, vObj.z) * 3.0));`);
   };
@@ -343,7 +377,7 @@ function init() {
   const wheel = new THREE.Group(); scene.add(wheel);
   const fade = [];
   const mat = (o) => { const m = new THREE.MeshStandardMaterial(o); fade.push(m); return m; };
-  const headMat = mat({ map: headMap, metalness: .7, roughness: .3, envMapIntensity: 1.6 });
+  const headMat = mat({ map: headMap, metalness: .55, roughness: .22, roughnessMap: cloud, envMapIntensity: 1.6 });
   const head = new THREE.Mesh(new THREE.CylinderGeometry(.3, .298, .03, 128, 1), [mat({ color: 0xd0cfcb, metalness: .8, roughness: .25, envMapIntensity: 1.6 }), headMat, headMat]);
   head.position.y = Y0 - .015; head.receiveShadow = head.castShadow = true;
   const shaft = new THREE.Mesh(new THREE.CylinderGeometry(.05, .05, .06, 32), mat({ color: 0x55524e, metalness: .8, roughness: .45 }));
@@ -357,22 +391,35 @@ function init() {
     s.lineTo(-w / 2 + r, d / 2); s.quadraticCurveTo(-w / 2, d / 2, -w / 2, d / 2 - r); s.lineTo(-w / 2, -d / 2 + r); s.quadraticCurveTo(-w / 2, -d / 2, -w / 2 + r, -d / 2); return s; })();
   const bodyGeo = new THREE.ExtrudeGeometry(bodyShape, { depth: .2, bevelEnabled: true, bevelThickness: .018, bevelSize: .018, bevelSegments: 4, curveSegments: 10 });
   bodyGeo.rotateX(Math.PI / 2);
-  const body = new THREE.Mesh(bodyGeo, mat({ color: 0xc9c4bb, roughness: .42, metalness: .2 }));
+  const body = new THREE.Mesh(bodyGeo, mat({ color: 0xc9c4bb, map: bodyMap, roughness: .48, metalness: .15 }));
   body.position.y = Y0 - .07; body.receiveShadow = true;
-  const knob = new THREE.Mesh(new THREE.CylinderGeometry(.026, .028, .02, 40), mat({ color: 0xa65530, roughness: .35, metalness: .2 }));
+  const knob = new THREE.Mesh(new THREE.CylinderGeometry(.026, .028, .02, 40), mat({ color: 0x2b2826, roughness: .5, metalness: .3 }));
   knob.rotation.x = Math.PI / 2; knob.position.set(.22, Y0 - .17, .32);
-  const knobDot = new THREE.Mesh(new THREE.CylinderGeometry(.006, .006, .022, 12), mat({ color: 0xf3e6cf, roughness: .5 }));
+  const knobDot = new THREE.Mesh(new THREE.CylinderGeometry(.006, .006, .022, 12), mat({ color: 0xd8d4cc, roughness: .5 }));
   knobDot.rotation.x = Math.PI / 2; knobDot.position.set(.22, Y0 - .155, .322);
-  wheel.add(head, shaft, pan, body, knob, knobDot);
+  // barbotina húmeda acumulada alrededor de la base de la pieza (como en un torno de verdad)
+  const slipPts = []; for (let i = 0; i <= 16; i++) { const t = i / 16; slipPts.push(new THREE.Vector2(.94 + t * .2, Math.pow(Math.sin((1 - t) * Math.PI / 2), 1.6) * .011 + .0004)); }
+  const slip = new THREE.Mesh(new THREE.LatheGeometry(slipPts, 96), mat({ color: 0x8a7767, roughness: .12, roughnessMap: cloud, bumpMap: grain, bumpScale: .5, envMapIntensity: 1.3 }));
+  slip.position.y = Y0; slip.receiveShadow = true;
+  wheel.add(head, shaft, pan, body, knob, knobDot, slip);
 
   // ---------- la repisa de madera ----------
   const shelf = new THREE.Group(); scene.add(shelf);
   const woodMat = new THREE.MeshStandardMaterial({ map: woodMap, roughness: .62, metalness: 0, transparent: true });
-  const board = new THREE.Mesh(new THREE.BoxGeometry(.9, .034, .3), woodMat);
-  board.position.y = Y0 - .017; board.receiveShadow = true;
+  const boardGeo = (() => { const s = new THREE.Shape(); s.moveTo(-.45, -.15); s.lineTo(.45, -.15); s.lineTo(.45, .15); s.lineTo(-.45, .15); s.lineTo(-.45, -.15);
+    const g = new THREE.ExtrudeGeometry(s, { depth: .026, bevelEnabled: true, bevelThickness: .004, bevelSize: .004, bevelSegments: 3 });
+    g.rotateX(-Math.PI / 2); g.translate(0, -.03, 0);
+    const uv = g.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) / .9 + .5, uv.getY(i) / .3 + .5);
+    return g; })();
+  const board = new THREE.Mesh(boardGeo, woodMat);
+  board.position.y = Y0; board.receiveShadow = true;
   const brMat = new THREE.MeshStandardMaterial({ color: 0x3b2a20, roughness: .4, metalness: .6, transparent: true });
-  const br1 = new THREE.Mesh(new THREE.BoxGeometry(.022, .1, .05), brMat); br1.position.set(-.3, Y0 - .085, -.1);
-  const br2 = br1.clone(); br2.position.x = .3;
+  const bracket = () => { const g = new THREE.Group();
+    const v = new THREE.Mesh(new THREE.BoxGeometry(.012, .12, .03), brMat); v.position.set(0, -.094, -.13);
+    const hz = new THREE.Mesh(new THREE.BoxGeometry(.012, .006, .2), brMat); hz.position.set(0, -.037, -.05);
+    const d = new THREE.Mesh(new THREE.BoxGeometry(.01, .17, .006), brMat); d.position.set(0, -.09, -.085); d.rotation.x = .78;
+    g.add(v, hz, d); g.position.y = Y0; return g; };
+  const br1 = bracket(); br1.position.x = -.3; const br2 = bracket(); br2.position.x = .3;
   shelf.add(board, br1, br2);
 
   // ---------- tamaño ----------
@@ -399,7 +446,7 @@ function init() {
 
     // barro: húmedo y brillante → bizcocho mate → esmaltado
     clayMat.color.copy(WET).lerp(BISQUE, fire);
-    clayMat.roughness = lerp(.34, .92, fire);
+    clayMat.roughness = lerp(.5, 1.0, fire);
     clayMat.bumpScale = lerp(.9, 1.6, fire);
     U.uGlow.value = glow;
     U.uGlaze.value = glaze;
@@ -415,7 +462,8 @@ function init() {
     else lock = null;
     clay.rotation.y = rot;
     { const r0 = rMaxBase * 2 * 1.25; ao.scale.set(r0, r0, 1); }
-    head.rotation.y = spin;
+    head.rotation.y = spin; slip.rotation.y = spin;
+    { const b = Math.max(.02, rMaxBase * .99); slip.scale.set(b, 1 + smooth(clamp(s - .6)) * .3, b); }
 
     wheel.visible = wa > .001;
     wheel.position.y = -(1 - wa) * .08;
