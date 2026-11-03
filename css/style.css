@@ -369,6 +369,8 @@ em .ch, .ch.is-em { --s: 100; --k: 1; }
 /* --------------------------------------------------------------------------
    Contacto
    -------------------------------------------------------------------------- */
+/* Conoce más (vacía por ahora) */
+.conoce { position: relative; min-height: 100vh; background: var(--cream); }
 .contact { background: var(--cream-2); padding: clamp(40px, 6vw, 80px) 0 clamp(90px, 12vw, 160px); }
 .contact__title { font-size: clamp(3rem, 9.4vw, 10.4rem); line-height: .92; letter-spacing: -.04em; margin-bottom: clamp(40px, 6vw, 80px); }
 .contact__list { border-bottom: 1px solid var(--line); }
