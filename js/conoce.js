@@ -3,6 +3,8 @@
   const sec = document.querySelector('.sello');
   if (!sec || !window.gsap) return;
   const v = sec.querySelector('.sello__video');
+  // Pantallas grandes / retina: versión mejorada a 1772 px (limpiada y reescalada); teléfonos: la liviana
+  if (innerWidth >= 900) { v.src = 'img/sello-hd.mp4'; v.load(); }
   // Si el teléfono bloquea la reproducción automática (modo ahorro), se intenta al primer toque
   const play = () => v.play().catch(() => {});
   play(); addEventListener('touchstart', play, { once: true, passive: true });
