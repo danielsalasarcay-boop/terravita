@@ -584,12 +584,12 @@
     // En computadora y en el teléfono la sección se queda fija y la pieza avanza con todo el recorrido
     if (!reduce) ScrollTrigger.create({ trigger: '#contacto', start: 'top top', end: 'bottom bottom',
       onUpdate: s => { target = fit(s.progress); }, onRefresh: s => { target = fit(s.progress); size(); } });
-    if (fine) pieceEl.addEventListener('pointermove', e => { const r = cv.getBoundingClientRect(); lxT = clamp(((e.clientX - r.left) / r.width) * 2 - 1, -1, 1); });
+    if (fine) pieceEl.addEventListener('pointermove', e => { const r = cv.parentNode.getBoundingClientRect(); lxT = clamp(((e.clientX - r.left) / r.width) * 2 - 1, -1, 1); });
     $$('.contact__row').forEach(row => { row.addEventListener('mouseenter', () => { boost = 1; }); row.addEventListener('mouseleave', () => { boost = 0; }); });
 
     pieceTick = dt => {
-      const r0 = cv.getBoundingClientRect();
-      if (r0.bottom < -100 || r0.top > innerHeight + 100 || !W) return;
+      const r0 = cv.parentNode.getBoundingClientRect();
+      if (r0.bottom < -100 || r0.top > innerHeight + 100 || (!W && !window.__piece3d)) return;
       time += dt;
       ps = lerp(ps, target, phone.matches ? .14 : .08);
       lx = lerp(lx, lxT, .06);
@@ -607,6 +607,8 @@
       const cap = Math.min(5, Math.round(s - .2));
       if (cap !== lastCap) { lastCap = cap; caps.forEach((c, k) => c.classList.toggle('is-on', k === cap)); steps.forEach((d, k) => d.classList.toggle('is-on', k <= cap)); }
 
+      // Versión 3D real (js/piece3d.js); la ilustración 2D queda de respaldo si no hay WebGL
+      if (window.__piece3d) { window.__piece3d.render({ s, spin, lx }); return; }
       const w = W, cx = w / 2, base = w * .74, h = lerp(A.h, B.h, f) * w * .95, o = lerp(A.o, B.o, f);
       const R = k => lerp(A.r[k], B.r[k], f) * w * .92;
       const rAt = u => { const x = clamp(u) * K, k = Math.floor(x), t = x - k; return k >= K ? R(K) : R(k) * (1 - t) + R(k + 1) * t; };

@@ -617,6 +617,10 @@ em .ch, .ch.is-em { --s: 100; --k: 1; }
   background: radial-gradient(90% 70% at 50% 35%, #FBF1DD 0%, #EEDDBE 70%, #E6D1AE 100%); box-shadow: inset 0 0 0 1px rgba(150,65,27,.12); }
 .piece__stage::after { content: ""; position: absolute; inset: 0; background: var(--speckle); background-size: 300px 300px; opacity: .06; pointer-events: none; }
 .piece__canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.piece__gl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.piece__stage.is-3d .piece__canvas { display: none; }
+.piece__stage.is-3d { background: radial-gradient(85% 75% at 50% 30%, #FBF3E4 0%, #F1E3CA 62%, #E4CFAE 100%); }
+.piece__stage.is-3d::after { display: none; }
 .piece__caps { position: relative; height: 3.4em; margin-top: 22px; font-size: clamp(1.3rem, 1.9vw, 1.8rem); }
 .piece__cap { position: absolute; inset: 0; display: flex; align-items: baseline; gap: 14px; opacity: 0; transform: translateY(14px); transition: opacity .6s var(--ease), transform .7s var(--ease); }
 .piece__cap.is-on { opacity: 1; transform: none; }
