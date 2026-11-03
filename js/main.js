@@ -260,7 +260,7 @@
   // Header: se esconde al bajar, aparece al subir, cambia de color
   // ------------------------------------------------------------------
   const header = $('#header');
-  const lightZones = $$('.eventos, .footer');
+  const lightZones = $$('.eventos, .footer, .sello');
   let lastY = 0;
   function headerTick() {
     const y = scrollY;

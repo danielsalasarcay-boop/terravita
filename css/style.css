@@ -739,3 +739,67 @@ em .ch, .ch.is-em { --s: 100; --k: 1; }
 .footer__big { position: relative; }
 .footer__contact .footer__big i { position: absolute; right: -1.1em; top: .2em; }
 @media (min-width: 900px) { .footer__contact { padding-right: 0; } }
+
+/* ==========================================================================
+   CONOCE MÁS · EL SELLO (video del taller → animación con el scroll)
+   ========================================================================== */
+.sello { position: relative; height: 560vh; background: var(--ink); color: var(--cream); }
+.sello__stage { position: sticky; top: 0; height: 100vh; height: var(--vh); overflow: hidden; }
+/* La ventana inicial (solo sirve para medir; el video se recorta con clip-path) */
+.sello__frame { --fw: min(27vw, calc(var(--vh) * .5)); position: absolute; left: 50%; top: 53%; width: var(--fw); aspect-ratio: 886 / 1094; transform: translate(-50%, -50%); visibility: hidden; }
+.sello__cv { position: absolute; inset: 0; width: 100%; height: 100%; display: block; will-change: clip-path, filter; }
+.sello__shade { position: absolute; inset: 0; pointer-events: none; opacity: 0;
+  background: radial-gradient(120% 90% at 50% 45%, transparent 45%, rgba(20,12,7,.55)), linear-gradient(to top, rgba(20,12,7,.7), transparent 38%); }
+.sello__clay { position: absolute; inset: 0; pointer-events: none; opacity: 0; background: var(--clay) var(--speckle); background-size: 420px 420px; }
+/* Título a los lados de la ventana */
+.sello__title { position: absolute; inset: 0; pointer-events: none; margin: 0; font: inherit; }
+.sello__half { --fw: min(27vw, calc(var(--vh) * .5)); position: absolute; top: 53%; display: flex; flex-direction: column; transform: translateY(-50%);
+  font-family: var(--f-display); font-weight: 400; font-size: clamp(2.6rem, 5.4vw, 6.6rem); line-height: .94; letter-spacing: -.025em;
+  font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1; }
+.sello__half--l { right: calc(50% + var(--fw) / 2 + 3.2vw); text-align: right; align-items: flex-end; }
+.sello__half--r { left: calc(50% + var(--fw) / 2 + 3.2vw); }
+.sello__half em { color: #E9A178; font-style: italic; }
+.sello__half small { font: 500 12px var(--f-text); letter-spacing: .22em; text-transform: uppercase; color: #E9A178; margin-bottom: 18px; }
+.sello__ln { display: block; overflow: hidden; padding-bottom: .06em; }
+.sello__ln > span { display: block; }
+.sello__cue { position: absolute; left: 50%; bottom: 26px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 10px;
+  font: 500 11px var(--f-text); letter-spacing: .22em; text-transform: uppercase; opacity: .8; }
+.sello__cue i { width: 1px; height: 38px; background: linear-gradient(var(--cream), transparent); animation: selloCue 1.8s var(--ease) infinite; transform-origin: top; }
+@keyframes selloCue { 0% { transform: scaleY(0); } 50% { transform: scaleY(1); transform-origin: top; } 51% { transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
+/* Frases del video */
+.sello__caps { position: absolute; left: var(--gutter); right: var(--gutter); bottom: clamp(34px, 7vh, 70px); height: 1.2em;
+  font-family: var(--f-display); font-size: clamp(2rem, 4.6vw, 5rem); line-height: 1; letter-spacing: -.02em; font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1; }
+.sello__cap { position: absolute; left: 0; bottom: 0; margin: 0; display: flex; align-items: baseline; gap: .45em; white-space: nowrap; opacity: 0; text-shadow: 0 2px 30px rgba(0,0,0,.35); }
+.sello__cap b { font: 500 12px var(--f-text); letter-spacing: .2em; color: #E9A178; transform: translateY(-.4em); }
+.sello__cap em { font-style: italic; color: #F2B48E; }
+/* El logo que nace de la marca */
+.sello__logo { position: absolute; left: 0; top: 0; width: 100px; opacity: 0; pointer-events: none; perspective: 900px; will-change: transform, opacity; }
+.sello__logo-in { transform-style: preserve-3d; will-change: transform; }
+.sello__logo svg { display: block; width: 100%; height: auto; aspect-ratio: 1464 / 1736; fill: var(--cream); overflow: visible;
+  filter: drop-shadow(0 1px 0 rgba(255,255,255,.18)) drop-shadow(0 18px 30px rgba(43,26,17,.35)); }
+/* Cierre */
+.sello__end { position: absolute; left: 0; right: 0; bottom: clamp(36px, 9vh, 96px); display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 var(--gutter); pointer-events: none; }
+.sello__end.is-on { pointer-events: auto; }
+.sello__end-t { margin: 0; font-family: var(--f-display); font-weight: 400; font-size: clamp(2.4rem, 5vw, 5.4rem); line-height: .98; letter-spacing: -.025em; font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1; }
+.sello__end-t em { font-style: italic; color: #FFD9BD; }
+.sello__end-p { max-width: 34em; margin: 18px 0 0; font-size: clamp(.95rem, 1.15vw, 1.1rem); line-height: 1.6; opacity: 0; color: rgba(255,245,222,.88); }
+.sello__end-cta { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 26px; opacity: 0; }
+.sello .btn--ghost { color: var(--cream); }
+@media (hover: hover) { .sello .btn--ghost:hover::before { background: var(--cream); } .sello .btn--ghost:hover { color: var(--clay); } }
+.sello__bar { position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: rgba(255,245,222,.12); }
+.sello__bar i { display: block; height: 100%; width: 100%; background: #E9A178; transform-origin: left; transform: scaleX(0); }
+
+@media (max-width: 899px) {
+  .sello { height: 470vh; }
+  .sello__frame, .sello__half { --fw: min(58vw, calc(var(--vh) * .36)); }
+  .sello__frame { top: 50%; }
+  .sello__half { font-size: clamp(2.3rem, 10.5vw, 3.4rem); flex-direction: row; gap: .26em; align-items: baseline; transform: translateX(-50%); left: 50%; right: auto; white-space: nowrap; }
+  .sello__half .sello__ln { display: inline-block; }
+  .sello__half--l { top: auto; bottom: calc(50% + var(--fw) * 1094 / 886 / 2 + 22px); flex-wrap: wrap; justify-content: center; text-align: center; width: 100%; }
+  .sello__half--l small { width: 100%; margin-bottom: 10px; text-align: center; }
+  .sello__half--r { top: calc(50% + var(--fw) * 1094 / 886 / 2 + 16px); }
+  .sello__cue { bottom: 18px; }
+  .sello__caps { font-size: clamp(1.7rem, 8vw, 2.4rem); bottom: 30px; }
+  .sello__end { bottom: max(28px, 5vh); }
+  .sello__end-cta .btn { height: 50px; padding: 0 22px; font-size: 14px; }
+}
