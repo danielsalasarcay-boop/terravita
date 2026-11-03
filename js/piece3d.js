@@ -28,7 +28,7 @@ function init() {
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.05;
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = THREE.VSMShadowMap;
   renderer.setClearColor(0x000000, 0);
   const cv = renderer.domElement;
   cv.className = 'piece__gl';
@@ -62,7 +62,7 @@ function init() {
   key.castShadow = true;
   key.shadow.mapSize.set(1024, 1024);
   Object.assign(key.shadow.camera, { left: -.6, right: .6, top: .6, bottom: -.6, near: .1, far: 6 });
-  key.shadow.bias = -.0004; key.shadow.normalBias = .006; key.shadow.radius = 3;
+  key.shadow.bias = -.0002; key.shadow.normalBias = .004; key.shadow.radius = 14; key.shadow.blurSamples = 20;
   scene.add(key, key.target);
   key.target.position.set(0, Y0 + .1, 0);
   scene.add(new THREE.HemisphereLight(0xfff4e4, 0x7a5236, .35));
@@ -82,7 +82,7 @@ function init() {
     x.fillStyle = '#dcdcdc'; x.fillRect(0, 0, w, h);
     for (let i = 0; i < 900; i++) {
       const y = rnd() * h, len = 40 + rnd() * 380, l = rnd() > .5;
-      x.strokeStyle = l ? `rgba(255,250,244,${.05 + rnd() * .12})` : `rgba(90,70,60,${.04 + rnd() * .1})`;
+      x.strokeStyle = l ? `rgba(255,250,244,${.03 + rnd() * .07})` : `rgba(90,70,60,${.015 + rnd() * .04})`;
       x.lineWidth = .6 + rnd() * 3.4;
       const x0 = rnd() * w;
       x.beginPath(); x.moveTo(x0, y); x.bezierCurveTo(x0 + len * .3, y + (rnd() - .5) * 3, x0 + len * .7, y + (rnd() - .5) * 3, x0 + len, y + (rnd() - .5) * 2); x.stroke();
@@ -134,7 +134,7 @@ function init() {
     for (let r = 4; r < c; r += 2 + rnd() * 3) { x.strokeStyle = `rgba(${rnd() > .5 ? '255,255,255' : '60,60,60'},${.05 + rnd() * .12})`; x.lineWidth = 1 + rnd(); x.beginPath(); x.arc(c, c, r, 0, TAU); x.stroke(); }
     for (let i = 0; i < 16; i++) { // barbotina seca en arcos
       const r = c * (.35 + rnd() * .62), a = rnd() * TAU, len = .3 + rnd() * 1.6;
-      x.strokeStyle = `rgba(150,92,62,${.18 + rnd() * .35})`; x.lineWidth = 3 + rnd() * 16; x.lineCap = 'round';
+      x.strokeStyle = `rgba(150,126,104,${.25 + rnd() * .4})`; x.lineWidth = 3 + rnd() * 16; x.lineCap = 'round';
       x.beginPath(); x.arc(c, c, r, a, a + len); x.stroke();
     }
     x.fillStyle = 'rgba(120,120,118,.9)'; [0, 1, 2].forEach(k => { const a = k * TAU / 3 + .3; x.beginPath(); x.arc(c + Math.cos(a) * c * .55, c + Math.sin(a) * c * .55, 9, 0, TAU); x.fill(); });
@@ -142,12 +142,12 @@ function init() {
   // Bandeja: fibra terracota con salpicaduras de barbotina
   const panMap = canvasTex(1024, 256, (x, w, h) => {
     x.fillStyle = '#ffffff'; x.fillRect(0, 0, w, h);
-    for (let i = 0; i < 260; i++) {
-      const cx = rnd() * w, cy = rnd() * h, r = 1 + Math.pow(rnd(), 2) * 9;
-      x.fillStyle = `rgba(226,190,158,${.15 + rnd() * .35})`;
+    for (let i = 0; i < 140; i++) {
+      const cx = rnd() * w, cy = rnd() * h, r = .8 + Math.pow(rnd(), 3) * 6;
+      x.fillStyle = `rgba(${rnd() > .5 ? '150,128,108' : '182,164,146'},${.12 + rnd() * .3})`;
       x.beginPath(); x.ellipse(cx, cy, r * (1 + rnd() * 3), r, 0, 0, TAU); x.fill();
     }
-    for (let i = 0; i < 30; i++) { x.fillStyle = `rgba(200,150,110,${.1 + rnd() * .15})`; x.fillRect(rnd() * w, h * (.55 + rnd() * .45), 20 + rnd() * 120, 3 + rnd() * 10); }
+    for (let i = 0; i < 30; i++) { x.fillStyle = `rgba(160,140,120,${.12 + rnd() * .18})`; x.fillRect(rnd() * w, h * (.55 + rnd() * .45), 20 + rnd() * 120, 3 + rnd() * 10); }
   });
   // Madera de la repisa
   const woodMap = canvasTex(1024, 256, (x, w, h) => {
@@ -200,7 +200,7 @@ function init() {
   for (let j = 0; j <= S; j++) { sinT[j] = Math.sin(j / S * TAU); cosT[j] = Math.cos(j / S * TAU); }
   if (S) { sinT[S] = sinT[0]; cosT[S] = cosT[0]; }
 
-  let H = .5, ym = .25, rMax = .3;
+  let H = .5, ym = .25, rMax = .3, rMaxBase = .2;
   function build(s) {
     const i0 = Math.min(4, Math.floor(s)), i1 = Math.min(4, i0 + 1), f0 = s - Math.floor(s);
     const f = i0 === i1 ? 0 : smooth(clamp((f0 - .12) / .76));
@@ -231,7 +231,7 @@ function init() {
       else { const w = (q - .8) / .2, xw = Math.max(.004, rAt(uf) - t); xo = xw * (1 - smooth(w)); yo = yf - Math.sin(w * Math.PI) * .004; }
       px[n] = lerp(xc, xo, o); py[n] = lerp(yc, yo, o); pin[n] = o; n++;
     }
-    H = h; ym = h * .5; rMax = 0; for (let k = 0; k < M; k++) rMax = Math.max(rMax, px[k]);
+    H = h; ym = h * .5; rMax = 0; for (let k = 0; k < M; k++) rMax = Math.max(rMax, px[k]); rMaxBase = rAt(0);
     for (let j = 0; j <= S; j++) {
       const sn = sinT[j], cs = cosT[j], ph = j / S * TAU;
       for (let k = 0; k < M; k++) {
@@ -264,9 +264,9 @@ function init() {
   const U = {
     uGlaze: { value: 0 }, uDip: { value: .2 }, uGlow: { value: 0 }, uStamp: { value: 0 }, uStampS: { value: 1 },
     uStampY: { value: .2 }, uStampW: { value: .085 }, uSpeck: { value: speck }, uStampT: { value: stampTex },
-    uGlazeCol: { value: new THREE.Color(0xf3e8d2) }, uSpeckCol: { value: new THREE.Color(0x5a2e17) }, uSealCol: { value: new THREE.Color(0x96411b) },
+    uGlazeCol: { value: new THREE.Color(0xf1e7d4) }, uSpeckCol: { value: new THREE.Color(0x4a2a17) }, uSealCol: { value: new THREE.Color(0x6e3d22) }, uBreakCol: { value: new THREE.Color(0xb88452) }, uTop: { value: .5 },
   };
-  const WET = new THREE.Color(0x8e4f33), BISQUE = new THREE.Color(0xc47d58);
+  const WET = new THREE.Color(0x7f6b5c), BISQUE = new THREE.Color(0xd9c4a4);
   const clayMat = new THREE.MeshStandardMaterial({ color: WET.clone(), map: clayMap, bumpMap: grain, bumpScale: .9, roughness: .34, metalness: 0, envMapIntensity: 1.05 });
   clayMat.onBeforeCompile = sh => {
     Object.assign(sh.uniforms, U);
@@ -277,8 +277,16 @@ function init() {
       .replace('#include <common>', `#include <common>
         varying vec3 vObj; varying float vInner;
         uniform float uGlaze, uDip, uGlow, uStamp, uStampS, uStampY, uStampW;
-        uniform sampler2D uSpeck, uStampT; uniform vec3 uGlazeCol, uSpeckCol, uSealCol;
-        float gMask; float sealA;`)
+        uniform sampler2D uSpeck, uStampT; uniform vec3 uGlazeCol, uSpeckCol, uSealCol, uBreakCol; uniform float uTop;
+        float gMask; float sealA;
+        // relieve del sello (0..1), hundido en la pared exterior
+        float stampH() {
+          if (uStamp <= 0.0 || vInner > 0.5) return 0.0;
+          float ang = atan(vObj.x, vObj.z), rr = length(vObj.xz);
+          vec2 st = vec2(ang * rr, vObj.y - uStampY) / (uStampW * uStampS) * vec2(1.0, 1464.0 / 1736.0) + 0.5;
+          if (st.x < 0.0 || st.x > 1.0 || st.y < 0.0 || st.y > 1.0 || cos(ang) < 0.0) return 0.0;
+          return texture2D(uStampT, st).a * uStamp;
+        }`)
       .replace('#include <map_fragment>', `#include <map_fragment>
         {
           float ang = atan(vObj.x, vObj.z);
@@ -293,24 +301,30 @@ function init() {
           float sp2 = texture2D(uSpeck, sUv * 2.7 + 0.31).r;
           vec3 glaze = uGlazeCol * (1.0 - edge * 0.07);
           glaze = mix(glaze, uSpeckCol, clamp(sp * 0.9 + sp2 * 0.35, 0.0, 1.0));
+          // el esmalte se adelgaza y "quiebra" a ámbar en las crestas del torneado y en el labio
+          float y = vObj.y;
+          float ridge = sin(y / 0.02 * 6.2832 + 0.8) + 0.5 * sin(y / 0.0137 * 6.2832 + 2.1) + 0.4 * sin(y / 0.051 * 6.2832);
+          float brk = smoothstep(0.6, 1.7, ridge) * 0.28 * (1.0 - vInner) + smoothstep(uTop - 0.016, uTop + 0.004, y) * 0.55;
+          brk += edge * 0.35;
+          glaze = mix(glaze, uBreakCol, clamp(brk, 0.0, 0.8) * (1.0 - clamp(sp * 1.2, 0.0, 1.0)));
           diffuseColor.rgb = mix(diffuseColor.rgb, glaze, gMask);
           // sello estampado: hundido en el barro, se ve el terracota a través del esmalte
           sealA = 0.0;
           if (uStamp > 0.0 && vInner < 0.5) {
             vec2 st = vec2(ang * rr, vObj.y - uStampY) / (uStampW * uStampS) * vec2(1.0, 1464.0 / 1736.0) + 0.5;
-            st.y = 1.0 - st.y;
             if (st.x > 0.0 && st.x < 1.0 && st.y > 0.0 && st.y < 1.0 && cos(ang) > 0.0) {
               float a = texture2D(uStampT, st).a;
               float a2 = texture2D(uStampT, st + vec2(-0.012, -0.012)).a;
               sealA = a * uStamp;
-              vec3 seal = uSealCol * (0.92 - (a2 - a) * 0.6);
-              diffuseColor.rgb = mix(diffuseColor.rgb, seal, sealA);
-              diffuseColor.rgb *= 1.0 - clamp(a - a2, 0.0, 1.0) * 0.35 * uStamp;
+              vec3 seal = uSealCol;
+              diffuseColor.rgb = mix(diffuseColor.rgb, seal, sealA * 0.82);
             }
           }
         }`)
+      .replace('#include <normal_fragment_maps>', `#include <normal_fragment_maps>
+        { float hS = stampH(); if (uStamp > 0.0) normal = perturbNormalArb(-vViewPosition, normal, vec2(dFdx(hS), dFdy(hS)) * -2.2, faceDirection); }`)
       .replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>
-        roughnessFactor = mix(roughnessFactor, 0.15, gMask * (1.0 - sealA));`)
+        roughnessFactor = mix(roughnessFactor, 0.15, gMask);`)
       .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
         totalEmissiveRadiance += uGlow * vec3(1.0, 0.36, 0.09) * (0.75 + 0.25 * sin(vObj.y * 40.0 + atan(vObj.x, vObj.z) * 3.0));`);
   };
@@ -318,6 +332,12 @@ function init() {
   clay.castShadow = clay.receiveShadow = true;
   clay.frustumCulled = false;
   const pieceG = new THREE.Group(); pieceG.add(clay); pieceG.position.y = Y0; scene.add(pieceG);
+  // sombra de contacto (oclusión) justo debajo de la pieza
+  const aoTex = canvasTex(256, 256, (x, w) => { const g = x.createRadialGradient(w / 2, w / 2, 0, w / 2, w / 2, w / 2);
+    g.addColorStop(0, 'rgba(0,0,0,.9)'); g.addColorStop(.42, 'rgba(0,0,0,.75)'); g.addColorStop(.62, 'rgba(0,0,0,.25)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+    x.fillStyle = g; x.fillRect(0, 0, w, w); }, false);
+  const ao = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ color: 0x2a1a10, alphaMap: aoTex, transparent: true, opacity: .55, depthWrite: false }));
+  ao.rotation.x = -Math.PI / 2; ao.position.y = .0012; ao.renderOrder = 1; pieceG.add(ao);
 
   // ---------- el torno ----------
   const wheel = new THREE.Group(); scene.add(wheel);
@@ -329,7 +349,7 @@ function init() {
   const shaft = new THREE.Mesh(new THREE.CylinderGeometry(.05, .05, .06, 32), mat({ color: 0x55524e, metalness: .8, roughness: .45 }));
   shaft.position.y = Y0 - .06;
   const panPts = [[.1, -.068], [.36, -.07], [.385, -.066], [.398, -.045], [.405, -.018], [.412, -.006], [.42, -.004], [.426, -.01], [.424, -.024], [.415, -.06], [.4, -.09]].map(p => new THREE.Vector2(p[0], p[1]));
-  const pan = new THREE.Mesh(new THREE.LatheGeometry(panPts, 128), mat({ color: 0x9a5a3e, map: panMap, roughness: .62, metalness: 0, side: THREE.DoubleSide }));
+  const pan = new THREE.Mesh(new THREE.LatheGeometry(panPts, 128), mat({ color: 0xf2efe8, map: panMap, roughness: .38, metalness: 0, side: THREE.DoubleSide }));
   pan.position.y = Y0; pan.receiveShadow = true;
   // cuerpo del torno: caja de bordes redondeados
   const bodyShape = (() => { const w = .72, d = .6, r = .07, s = new THREE.Shape();
@@ -337,7 +357,7 @@ function init() {
     s.lineTo(-w / 2 + r, d / 2); s.quadraticCurveTo(-w / 2, d / 2, -w / 2, d / 2 - r); s.lineTo(-w / 2, -d / 2 + r); s.quadraticCurveTo(-w / 2, -d / 2, -w / 2 + r, -d / 2); return s; })();
   const bodyGeo = new THREE.ExtrudeGeometry(bodyShape, { depth: .2, bevelEnabled: true, bevelThickness: .018, bevelSize: .018, bevelSegments: 4, curveSegments: 10 });
   bodyGeo.rotateX(Math.PI / 2);
-  const body = new THREE.Mesh(bodyGeo, mat({ color: 0xcdb896, roughness: .55, metalness: .05 }));
+  const body = new THREE.Mesh(bodyGeo, mat({ color: 0xc9c4bb, roughness: .42, metalness: .2 }));
   body.position.y = Y0 - .07; body.receiveShadow = true;
   const knob = new THREE.Mesh(new THREE.CylinderGeometry(.026, .028, .02, 40), mat({ color: 0xa65530, roughness: .35, metalness: .2 }));
   knob.rotation.x = Math.PI / 2; knob.position.set(.22, Y0 - .17, .32);
@@ -385,7 +405,8 @@ function init() {
     U.uGlaze.value = glaze;
     U.uDip.value = lerp(H * 1.05, H * .3, glaze);  // el esmalte baja desde la boca (pieza sumergida boca abajo)
     U.uStamp.value = stamp;
-    U.uStampS.value = 1 + (1 - stamp) * .9;
+    U.uStampS.value = 1;
+    U.uTop.value = H;
     U.uStampY.value = H * .5;
 
     // giro del torno; al final la pieza se detiene con el sello de frente
@@ -393,6 +414,7 @@ function init() {
     if (g > 0) { if (lock === null) lock = Math.ceil(spin / TAU + .2) * TAU; rot = lerp(spin, lock, smooth(clamp(g / .62))); }
     else lock = null;
     clay.rotation.y = rot;
+    { const r0 = rMaxBase * 2 * 1.25; ao.scale.set(r0, r0, 1); }
     head.rotation.y = spin;
 
     wheel.visible = wa > .001;
