@@ -189,6 +189,7 @@ em .ch, .ch.is-em { --s: 100; --k: 1; }
 .header__word { width: 62px; height: 45px; fill: currentColor; }
 .header__nav { position: relative; display: flex; margin: 0 -14px; }
 .header__nav--r { justify-self: end; }
+@media (min-width: 900px) and (max-width: 1080px) { .header__nav a { padding: 0 9px; font-size: .94em; } .header__nav { margin: 0 -9px; } }
 .header__nav a { position: relative; z-index: 1; display: flex; align-items: center; min-height: 40px; padding: 0 14px; border-radius: 999px; white-space: nowrap; opacity: .82; transition: opacity .3s, color .3s; }
 .header__nav a:hover, .header__nav a:focus-visible, .header__nav a[aria-current] { opacity: 1; }
 /* La píldora que sigue al cursor (y si no hay cursor, marca la sección visible) */

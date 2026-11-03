@@ -11,4 +11,4 @@ Vista local: `python3 -m http.server 47311 --directory ~/terravita`
 
 ## Al publicar cambios
 Actualiza la versión de CSS/JS (si no, el navegador muestra archivos viejos):
-`V=$(cat css/style.css js/main.js js/piece3d.js | md5 | cut -c1-8); sed -i '' -E "s#(css/style\.css|js/main\.js|js/piece3d\.js)(\?v=[a-z0-9]+)?#\1?v=$V#g" index.html nosotros.html`
+`V=$(cat css/style.css js/main.js js/piece3d.js | md5 | cut -c1-8); sed -i '' -E "s#(css/style\.css|js/main\.js|js/piece3d\.js)(\?v=[a-z0-9]+)?#\1?v=$V#g" index.html nosotros.html conoce-mas.html`
